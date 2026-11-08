@@ -513,15 +513,31 @@
   }
 
   // ---------- render: pending (PRs + issues needing approval) ----------
-  async function checksFor(sha) {
+  // Check status for a PR. Uses check-runs when the token may read checks;
+  // otherwise falls back to the PR's mergeable_state (needs only Pull requests: read).
+  async function checksFor(p) {
     try {
-      const r = await gh(rp() + '/commits/' + encodeURIComponent(sha) + '/check-runs?per_page=50');
+      const r = await gh(rp() + '/commits/' + encodeURIComponent(p.head.sha) + '/check-runs?per_page=50');
       const runs = r.check_runs || [];
-      if (!runs.length) return ['لا فحوص', 'muted', true];
-      if (runs.some((c) => c.status !== 'completed')) return ['الفحوص جارية', 'wait', false];
-      if (runs.every((c) => ['success', 'neutral', 'skipped'].includes(c.conclusion))) return ['الفحوص ناجحة', 'ok', true];
-      return ['فحص فاشل', 'fail', false];
-    } catch (e) { return ['الفحوص غير معروفة', 'muted', true]; }
+      if (runs.length) {
+        if (runs.some((c) => c.status !== 'completed')) return ['الفحوص جارية', 'wait', false];
+        if (runs.every((c) => ['success', 'neutral', 'skipped'].includes(c.conclusion))) return ['الفحوص ناجحة', 'ok', true];
+        return ['فحص فاشل', 'fail', false];
+      }
+    } catch (e) { /* no Checks permission: fall back below */ }
+    try {
+      const d = await gh(rp() + '/pulls/' + p.number);
+      switch (d.mergeable_state) {
+        case 'clean': return ['جاهز للدمج', 'ok', true];
+        case 'has_hooks': return ['جاهز للدمج', 'ok', true];
+        case 'unstable': return ['فحص فاشل', 'fail', false];
+        case 'blocked': return ['ينتظر الفحوص أو القواعد', 'wait', false];
+        case 'dirty': return ['تعارض مع الفرع الرئيسي', 'fail', false];
+        case 'behind': return ['متأخر عن الفرع الرئيسي', 'wait', true];
+        case 'draft': return ['مسودة', 'muted', false];
+        default: return ['الحالة تُحسب الآن', 'wait', true];
+      }
+    } catch (e) { return ['الحالة غير معروفة', 'muted', true]; }
   }
   async function renderPending(pulls, issues) {
     const box = $('pending');
@@ -530,7 +546,7 @@
     c.textContent = total;
     c.classList.toggle('hot', total > 0);
     if (!total) { box.replaceChildren(el('div', { class: 'empty', text: 'لا شيء ينتظرك الآن.' })); return; }
-    const checks = await Promise.all(pulls.map((p) => checksFor(p.head.sha)));
+    const checks = await Promise.all(pulls.map((p) => checksFor(p)));
     const items = [];
     pulls.forEach((p, k) => {
       const [ct, cc, mergeable] = checks[k];

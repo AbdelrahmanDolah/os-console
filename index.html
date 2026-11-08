@@ -5,194 +5,320 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://api.github.com; img-src data: https://avatars.githubusercontent.com; base-uri 'none'; form-action 'none'">
+<meta name="color-scheme" content="dark">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://api.github.com; img-src data: https://avatars.githubusercontent.com; base-uri 'none'; form-action 'none'">
 <title>لوحة OS</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Reem+Kufi:wght@500;700&display=swap">
 <style>
   :root {
-    --bg: #f6f5f1; --panel: #ffffff; --ink: #1d1d1b; --quiet: #6b6a64; --line: #e3e1d9;
-    --accent: #1f5fbf; --accent-soft: #e6eefb; --good: #1d7a3e; --good-soft: #e3f3e8;
-    --warn: #9a6200; --warn-soft: #fbf0d9; --bad: #b3261e; --bad-soft: #fbe5e3;
-    --radius: 12px; --shadow: 0 1px 2px rgba(0,0,0,.05);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #151514; --panel: #1f1f1d; --ink: #ecebe6; --quiet: #a3a199; --line: #34332f;
-      --accent: #7fa8ee; --accent-soft: #1f2a3d; --good: #6fcf8f; --good-soft: #1d3125;
-      --warn: #e8b55a; --warn-soft: #3a2f1b; --bad: #f08a80; --bad-soft: #3d2120; --shadow: none;
-    }
+    --night: #0E1424; --panel: #161E33; --panel-2: #1B2540; --line: #27324F;
+    --jasmine: #EEF0F4; --stone: #A89F90;
+    --olive: #8FBF5A; --olive-soft: rgba(143,191,90,.14);
+    --brass: #D6A64B; --brass-soft: rgba(214,166,75,.14);
+    --pomegranate: #E0565B; --pomegranate-soft: rgba(224,86,91,.14);
+    --sky: #8FB3FF;
+    --ui: "IBM Plex Sans Arabic", system-ui, "Segoe UI", Tahoma, sans-serif;
+    --display: "Reem Kufi", "IBM Plex Sans Arabic", system-ui, sans-serif;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--bg); color: var(--ink); }
-  body { font-family: system-ui, "Segoe UI", Tahoma, "Noto Sans Arabic", "Noto Kufi Arabic", sans-serif; font-size: 15px; line-height: 1.6; }
-  a { color: var(--accent); text-decoration: none; }
+  html, body { margin: 0; background: var(--night); color: var(--jasmine); }
+  body { font-family: var(--ui); font-size: 15px; line-height: 1.6; padding-bottom: 104px; }
+  a { color: var(--sky); text-decoration: none; }
   a:hover { text-decoration: underline; }
   button, input, select, textarea { font: inherit; color: inherit; }
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 16px; }
-  header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 4px 0 16px; }
-  .brand h1 { font-size: 20px; margin: 0; }
-  .brand .sub { color: var(--quiet); font-size: 13px; }
-  .who { display: flex; align-items: center; gap: 10px; color: var(--quiet); font-size: 13px; flex-wrap: wrap; }
-  .who img { width: 28px; height: 28px; border-radius: 50%; }
-  .btn { border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
-  .btn:hover { border-color: var(--quiet); }
-  .btn:disabled { opacity: .5; cursor: not-allowed; }
-  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .btn.good { background: var(--good); border-color: var(--good); color: #fff; }
-  .btn.bad { color: var(--bad); border-color: var(--bad); background: transparent; }
-  .btn.small { padding: 3px 10px; font-size: 13px; }
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
-  .card h2 { font-size: 16px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
-  .count { background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 0 9px; font-size: 13px; font-weight: 600; }
-  .count.hot { background: var(--bad-soft); color: var(--bad); }
-  .grid { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; margin-top: 16px; }
-  .span2 { grid-column: 1 / -1; }
-  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
-  .command textarea { width: 100%; min-height: 84px; resize: vertical; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: var(--bg); }
-  .command .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
-  .command select { border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; background: var(--panel); }
-  .command .hint { color: var(--quiet); font-size: 13px; margin-inline-start: auto; }
-  .item { border-top: 1px solid var(--line); padding: 12px 0; }
-  .item:first-of-type { border-top: 0; padding-top: 0; }
-  .item .title { font-weight: 600; }
-  .meta { color: var(--quiet); font-size: 13px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-  .actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-  .pill { display: inline-block; border-radius: 999px; padding: 0 9px; font-size: 12px; font-weight: 600; white-space: nowrap; }
-  .pill.ok { background: var(--good-soft); color: var(--good); }
-  .pill.wait { background: var(--warn-soft); color: var(--warn); }
-  .pill.fail { background: var(--bad-soft); color: var(--bad); }
-  .pill.muted { background: var(--bg); color: var(--quiet); border: 1px solid var(--line); }
-  .pill.blue { background: var(--accent-soft); color: var(--accent); }
-  .empty { color: var(--quiet); font-size: 14px; }
-  .dept { margin-top: 12px; }
-  .dept:first-child { margin-top: 0; }
-  .dept h3 { font-size: 13px; color: var(--quiet); margin: 0 0 6px; font-weight: 600; }
-  .agent { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 7px 0; border-top: 1px dashed var(--line); }
-  .agent:first-of-type { border-top: 0; }
-  .agent .name { font-weight: 600; }
-  .agent .last { color: var(--quiet); font-size: 12.5px; grid-column: 1 / -1; }
-  .log { max-height: 420px; overflow: auto; }
-  .log .entry { padding: 8px 0; border-top: 1px solid var(--line); }
-  .log .entry:first-child { border-top: 0; }
-  .log .entry .what { direction: auto; unicode-bidi: plaintext; }
-  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
-  .brief { max-height: 420px; overflow: auto; }
-  .brief h3, .brief h4 { margin: 12px 0 4px; font-size: 15px; }
-  .brief p { margin: 4px 0; }
-  .brief ul { margin: 4px 0; padding-inline-start: 20px; }
-  .brief code { background: var(--bg); padding: 0 4px; border-radius: 4px; }
-  .notice { border-radius: 8px; padding: 10px 12px; font-size: 14px; margin-top: 12px; }
-  .notice.bad { background: var(--bad-soft); color: var(--bad); }
-  .notice.warn { background: var(--warn-soft); color: var(--warn); }
-  .setup { max-width: 640px; margin: 40px auto; }
-  .setup label { display: block; font-weight: 600; margin: 14px 0 4px; }
-  .setup input[type=password], .setup input[type=text] { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--bg); direction: ltr; text-align: left; }
-  .setup ol { padding-inline-start: 20px; color: var(--quiet); font-size: 14px; }
-  .check { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 14px; }
-  .toast { position: fixed; inset-inline: 16px; bottom: 16px; margin: 0 auto; max-width: 560px; background: var(--ink); color: var(--bg); border-radius: 10px; padding: 10px 14px; font-size: 14px; display: none; z-index: 20; }
-  .toast a { color: inherit; text-decoration: underline; }
-  .modal-back { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; z-index: 30; padding: 16px; }
-  .modal { background: var(--panel); border-radius: var(--radius); padding: 18px; max-width: 480px; width: 100%; }
-  .modal h3 { margin: 0 0 8px; font-size: 16px; }
-  #modal-body { white-space: pre-line; }
-  .modal textarea { width: 100%; min-height: 80px; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--bg); margin-top: 8px; }
-  .modal .actions { justify-content: flex-start; margin-top: 14px; }
-  .ltr { direction: ltr; unicode-bidi: isolate; }
+  :focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
   .hidden { display: none !important; }
-  footer { color: var(--quiet); font-size: 12.5px; text-align: center; padding: 24px 0 8px; }
+  .ltr { direction: ltr; unicode-bidi: isolate; }
+
+  /* Header: brand + clocks + session */
+  .top {
+    position: relative; border-bottom: 1px solid var(--line);
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='%23EEF0F4' stroke-opacity='.045'%3E%3Cpath d='M28 4l7 17 17 7-17 7-7 17-7-17-17-7 17-7z'/%3E%3Crect x='16' y='16' width='24' height='24' transform='rotate(45 28 28)'/%3E%3C/g%3E%3C/svg%3E"),
+      linear-gradient(var(--night), var(--night));
+  }
+  .top-inner { max-width: 1320px; margin: 0 auto; padding: 18px 20px 14px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: baseline; gap: 12px; margin-inline-end: auto; }
+  .brand h1 { font-family: var(--display); font-weight: 700; font-size: 28px; margin: 0; letter-spacing: .5px; }
+  .brand .repo { color: var(--stone); font-size: 13px; }
+  .clocks { display: flex; gap: 16px; color: var(--stone); font-size: 13px; }
+  .clocks b { color: var(--jasmine); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .session { display: flex; align-items: center; gap: 10px; color: var(--stone); font-size: 13px; white-space: nowrap; }
+  .session img { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--line); }
+  .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--olive); display: inline-block; }
+  .pulse-dot.stale { background: var(--stone); }
+  .pulse-dot.err { background: var(--pomegranate); }
+
+  .btn { border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 6px 12px; cursor: pointer; color: var(--jasmine); }
+  .btn:hover { border-color: var(--stone); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn.small { padding: 3px 10px; font-size: 13px; }
+  .btn.go { background: var(--olive); border-color: var(--olive); color: #10200A; font-weight: 600; }
+  .btn.stop { background: transparent; border-color: var(--pomegranate); color: var(--pomegranate); }
+  .btn.primary { background: var(--brass); border-color: var(--brass); color: #2A1D05; font-weight: 600; }
+
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 18px 20px; }
+
+  /* Rail of numbers */
+  .rail { display: grid; grid-template-columns: repeat(6, 1fr); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--panel); }
+  .stat { padding: 14px 16px; border-inline-start: 1px solid var(--line); }
+  .stat:first-child { border-inline-start: 0; }
+  .stat .n { font-family: var(--display); font-size: 34px; line-height: 1.1; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stat .l { color: var(--stone); font-size: 13px; }
+  .stat.olive .n { color: var(--olive); }
+  .stat.brass .n { color: var(--brass); }
+  @media (max-width: 900px) { .rail { grid-template-columns: repeat(3, 1fr); } .stat:nth-child(4) { border-inline-start: 0; } .stat:nth-child(n+4) { border-top: 1px solid var(--line); } }
+
+  /* Pipeline: the order of work, a real sequence */
+  .pipeline { display: flex; align-items: stretch; margin-top: 14px; gap: 0; }
+  .stage { flex: 1; position: relative; padding: 10px 16px 10px 26px; background: var(--panel-2); border: 1px solid var(--line); border-inline-start: 0; }
+  .stage:first-child { border-inline-start: 1px solid var(--line); border-start-start-radius: 10px; border-end-start-radius: 10px; }
+  .stage:last-child { border-start-end-radius: 10px; border-end-end-radius: 10px; }
+  .stage .n { font-family: var(--display); font-size: 22px; font-weight: 700; }
+  .stage .l { color: var(--stone); font-size: 13px; }
+  .stage:not(:last-child)::after { content: ""; position: absolute; inset-inline-end: -9px; top: 50%; width: 16px; height: 16px; background: var(--panel-2); border-top: 1px solid var(--line); border-inline-end: 1px solid var(--line); transform: translateY(-50%) rotate(45deg); z-index: 1; }
+  [dir="rtl"] .stage:not(:last-child)::after { transform: translateY(-50%) rotate(-135deg); }
+  .stage.hot .n { color: var(--brass); }
+  @media (max-width: 700px) { .pipeline { flex-wrap: wrap; } .stage { flex: 1 1 30%; border: 1px solid var(--line); border-radius: 8px !important; margin: 3px; padding: 8px 12px; } .stage::after { display: none; } }
+
+  /* Main grid */
+  .grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 18px; align-items: start; }
+  .grid2 { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 16px; align-items: start; }
+  @media (max-width: 1100px) { .grid, .grid2 { grid-template-columns: 1fr 1fr; } .map-panel, .brief-panel { grid-column: 1 / -1; } }
+  @media (max-width: 700px) { .grid, .grid2 { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; min-width: 0; }
+  .panel h2 { font-family: var(--display); font-weight: 500; font-size: 19px; margin: 0 0 12px; display: flex; align-items: center; gap: 10px; }
+  .count { font-family: var(--ui); font-size: 13px; font-weight: 600; color: var(--stone); border: 1px solid var(--line); border-radius: 999px; padding: 0 9px; }
+  .count.brass { color: var(--brass); border-color: var(--brass); }
+  .empty { color: var(--stone); font-size: 14px; }
+
+  /* Workforce map */
+  .depts { columns: 2; column-gap: 12px; }
+  @media (max-width: 560px) { .depts { columns: 1; } }
+  .dept { border: 1px solid var(--line); border-radius: 10px; padding: 12px; background: var(--panel-2); break-inside: avoid; margin-bottom: 12px; }
+  .dept-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .dept-head h3 { margin: 0; font-size: 15px; font-weight: 600; }
+  .dept-head span { color: var(--stone); font-size: 12.5px; }
+  .agent { display: grid; grid-template-columns: 14px 1fr auto; gap: 2px 10px; align-items: center; width: 100%; text-align: start; background: none; border: 0; border-top: 1px solid var(--line); padding: 8px 2px; cursor: pointer; border-radius: 6px; }
+  .agent:first-of-type { border-top: 0; }
+  .agent:hover { background: rgba(238,240,244,.04); }
+  .agent .name { font-weight: 500; }
+  .agent .state { font-size: 12.5px; color: var(--stone); }
+  .agent .task { grid-column: 2 / -1; font-size: 12.5px; color: var(--olive); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line); border: 1px solid var(--stone); }
+  .dot.active { background: var(--olive-soft); border-color: var(--olive); }
+  .dot.reading { background: var(--brass-soft); border-color: var(--brass); }
+  .dot.working { background: var(--olive); border-color: var(--olive); box-shadow: 0 0 0 0 rgba(143,191,90,.55); animation: breathe 2.4s ease-out infinite; }
+  @keyframes breathe { 0% { box-shadow: 0 0 0 0 rgba(143,191,90,.55); } 70% { box-shadow: 0 0 0 8px rgba(143,191,90,0); } 100% { box-shadow: 0 0 0 0 rgba(143,191,90,0); } }
+  @media (prefers-reduced-motion: reduce) { .dot.working { animation: none; } }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; color: var(--stone); font-size: 12.5px; margin-top: 12px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+  /* Lists */
+  .item { border-top: 1px solid var(--line); padding: 12px 0; }
+  .item:first-child { border-top: 0; padding-top: 2px; }
+  .item .title { font-weight: 500; }
+  .item .title a { color: var(--jasmine); }
+  .meta { color: var(--stone); font-size: 12.5px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 2px; }
+  .actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .tag { display: inline-block; border-radius: 999px; padding: 0 8px; font-size: 12px; font-weight: 600; border: 1px solid var(--line); color: var(--stone); white-space: nowrap; }
+  .tag.ok { color: var(--olive); border-color: var(--olive); }
+  .tag.wait { color: var(--brass); border-color: var(--brass); }
+  .tag.fail { color: var(--pomegranate); border-color: var(--pomegranate); }
+  .feed { max-height: 760px; overflow: auto; margin-inline-end: -6px; padding-inline-end: 6px; }
+  .feed .entry { border-top: 1px solid var(--line); padding: 9px 0; }
+  .feed .entry:first-child { border-top: 0; padding-top: 0; }
+  .feed .who { font-weight: 600; font-size: 13px; }
+  .feed .what { unicode-bidi: plaintext; font-size: 14px; }
+  .feed .entry.live .who { color: var(--olive); }
+  .brief { max-height: 460px; overflow: auto; }
+  .brief h3, .brief h4 { margin: 12px 0 4px; font-size: 15px; font-weight: 600; }
+  .brief p { margin: 4px 0; max-width: 78ch; }
+  .brief ul { margin: 4px 0; padding-inline-start: 20px; }
+  .brief code { background: var(--panel-2); padding: 0 4px; border-radius: 4px; }
+  .notice { border-radius: 10px; padding: 10px 14px; font-size: 14px; margin-bottom: 14px; background: var(--pomegranate-soft); color: var(--pomegranate); border: 1px solid var(--pomegranate); }
+
+  /* Command bar */
+  .command { position: fixed; inset-inline: 0; bottom: 0; z-index: 15; background: rgba(14,20,36,.96); border-top: 1px solid var(--line); backdrop-filter: blur(6px); }
+  .command-inner { max-width: 1320px; margin: 0 auto; padding: 12px 20px; display: flex; gap: 10px; align-items: center; }
+  .modes { display: flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+  .modes button { background: none; border: 0; padding: 7px 12px; cursor: pointer; color: var(--stone); }
+  .modes button[aria-pressed="true"] { background: var(--panel-2); color: var(--jasmine); }
+  .command textarea { flex: 1; min-width: 0; height: 42px; max-height: 140px; resize: none; border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; background: var(--panel); }
+  .command select { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--panel); max-width: 190px; }
+  .mic { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel); cursor: pointer; flex-shrink: 0; display: grid; place-items: center; }
+  .mic.on { border-color: var(--pomegranate); background: var(--pomegranate-soft); }
+  @media (max-width: 760px) {
+    body { padding-bottom: 132px; }
+    .command-inner { flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+    .command textarea { order: 1; flex: 1 1 calc(100% - 120px); }
+    #cmd-send { order: 2; }
+    .modes { order: 3; }
+    .mic { order: 4; width: 36px; height: 36px; }
+    .command select { order: 5; flex: 1 1 0; min-width: 0; font-size: 13px; padding: 6px 8px; }
+    .toast { bottom: 140px; }
+  }
+
+  /* Agent drawer */
+  .scrim { position: fixed; inset: 0; background: rgba(5,8,16,.6); z-index: 25; display: none; }
+  .drawer { position: fixed; top: 0; bottom: 0; inset-inline-end: 0; width: min(440px, 100%); background: var(--panel); border-inline-start: 1px solid var(--line); z-index: 26; transform: translateX(-100%); transition: transform .22s ease-out; overflow: auto; padding: 20px; }
+  [dir="rtl"] .drawer { inset-inline-end: auto; inset-inline-start: auto; left: 0; border-inline-start: 0; border-inline-end: 1px solid var(--line); }
+  .drawer.open { transform: translateX(0); }
+  @media (prefers-reduced-motion: reduce) { .drawer { transition: none; } }
+  .drawer h2 { font-family: var(--display); font-size: 24px; font-weight: 700; margin: 0 0 4px; }
+  .drawer dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 14px 0; font-size: 14px; }
+  .drawer dt { color: var(--stone); }
+  .drawer dd { margin: 0; }
+  .drawer h3 { font-size: 15px; font-weight: 600; margin: 18px 0 6px; }
+
+  /* Setup, toast, modal */
+  .setup { max-width: 620px; margin: 48px auto; }
+  .setup label { display: block; font-weight: 600; margin: 14px 0 4px; }
+  .setup input[type=password], .setup input[type=text] { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; background: var(--panel-2); direction: ltr; text-align: left; }
+  .setup ol { padding-inline-start: 20px; color: var(--stone); font-size: 14px; }
+  .check { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 14px; }
+  .toast { position: fixed; inset-inline: 16px; bottom: 92px; margin: 0 auto; max-width: 560px; background: var(--jasmine); color: var(--night); border-radius: 10px; padding: 10px 14px; font-size: 14px; display: none; z-index: 40; }
+  .toast a { color: inherit; text-decoration: underline; }
+  .modal-back { position: fixed; inset: 0; background: rgba(5,8,16,.7); display: none; align-items: center; justify-content: center; z-index: 50; padding: 16px; }
+  .modal { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; max-width: 480px; width: 100%; }
+  .modal h3 { margin: 0 0 8px; font-size: 17px; }
+  #modal-body { white-space: pre-line; color: var(--stone); }
+  .modal textarea { width: 100%; min-height: 84px; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--panel-2); margin-top: 8px; }
+  .modal .actions { margin-top: 14px; }
+  footer { color: var(--stone); font-size: 12.5px; text-align: center; padding: 22px 0 6px; }
 </style>
 </head>
 <body>
 
-<!-- Setup screen: token stays in this browser only and is sent only to api.github.com -->
-<section id="setup" class="setup card hidden" aria-labelledby="setup-title">
+<section id="setup" class="setup panel hidden" aria-labelledby="setup-title">
   <h2 id="setup-title">ربط لوحة OS بالمستودع</h2>
-  <p class="empty">الرمز يُحفظ في هذا المتصفح فقط، ولا يُرسل إلا إلى api.github.com. الصفحة لا تحمّل أي سكربت من الخارج.</p>
+  <p class="empty">الرمز يبقى في هذا المتصفح، ولا يُرسل إلا إلى api.github.com.</p>
   <ol>
     <li>افتح <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">إنشاء رمز دقيق الصلاحيات</a>.</li>
-    <li>Repository access: Only select repositories ← المستودع الخاص فقط.</li>
-    <li>Repository permissions: Contents وIssues وPull requests، كلها Read and write.</li>
-    <li>Expiration: 90 يوماً. انسخ الرمز والصقه هنا.</li>
+    <li>اختر المستودع الخاص وحده.</li>
+    <li>Contents وIssues وPull requests: Read and write.</li>
+    <li>مدة 90 يوماً، ثم الصق الرمز هنا.</li>
   </ol>
   <label for="repo-input">المستودع</label>
   <input id="repo-input" type="text" placeholder="owner/repo" autocomplete="off" spellcheck="false">
-  <label for="token-input">الرمز (Fine-grained token)</label>
+  <label for="token-input">الرمز</label>
   <input id="token-input" type="password" placeholder="github_pat_..." autocomplete="off" spellcheck="false">
-  <div class="check"><input id="remember" type="checkbox" checked><label for="remember" style="margin:0;font-weight:400">تذكّر الرمز على هذا الجهاز (بدونها يُنسى عند إغلاق التبويب)</label></div>
+  <div class="check"><input id="remember" type="checkbox" checked><label for="remember" style="margin:0;font-weight:400">تذكّر الرمز على هذا الجهاز</label></div>
   <div class="actions" style="margin-top:16px"><button id="connect-btn" class="btn primary">اتصال</button></div>
-  <div id="setup-error" class="notice bad hidden" role="alert"></div>
+  <div id="setup-error" class="notice hidden" role="alert" style="margin-top:14px"></div>
 </section>
 
-<!-- Console -->
-<div id="app" class="wrap hidden">
+<div id="app" class="hidden">
   <header class="top">
-    <div class="brand">
-      <h1>لوحة OS</h1>
-      <div class="sub"><span id="repo-name" class="ltr"></span></div>
-    </div>
-    <div class="who">
-      <span id="refreshed">—</span>
-      <button id="refresh-btn" class="btn small" title="تحديث الآن">تحديث</button>
-      <img id="avatar" alt="" class="hidden" referrerpolicy="no-referrer">
-      <span id="login" class="ltr"></span>
-      <button id="logout-btn" class="btn small" title="نسيان الرمز من هذا المتصفح">خروج</button>
+    <div class="top-inner">
+      <div class="brand">
+        <h1>OS</h1>
+        <span class="repo"><span id="repo-name" class="ltr"></span></span>
+      </div>
+      <div class="clocks" aria-label="الوقت">
+        <span>أمستردام <b id="clock-ams">--:--</b></span>
+        <span>دمشق <b id="clock-dam">--:--</b></span>
+      </div>
+      <div class="session">
+        <span id="live-dot" class="pulse-dot stale" aria-hidden="true"></span>
+        <span id="refreshed">يتصل…</span>
+        <button id="refresh-btn" class="btn small">تحديث</button>
+        <img id="avatar" alt="" class="hidden" referrerpolicy="no-referrer">
+        <span id="login" class="ltr"></span>
+        <button id="logout-btn" class="btn small">خروج</button>
+      </div>
     </div>
   </header>
 
-  <div id="load-error" class="notice bad hidden" role="alert" style="margin:0 0 16px"></div>
+  <main class="wrap">
+    <div id="load-error" class="notice hidden" role="alert"></div>
 
-  <section class="card command" aria-labelledby="cmd-title">
-    <h2 id="cmd-title">أمر جديد</h2>
-    <textarea id="cmd-text" placeholder="اكتب أمرك كما تقوله لمدير عمليات: ماذا تريد، ومتى يُعتبر منجزاً…"></textarea>
-    <div class="row">
-      <select id="cmd-agent" aria-label="الوكيل">
-        <option value="">رئيس العمليات يقرر لمن</option>
-      </select>
-      <select id="cmd-priority" aria-label="الأولوية">
-        <option>عادية</option>
-        <option>عاجلة</option>
-        <option>عندما يتسع الوقت</option>
-      </select>
+    <section class="rail" aria-label="الأرقام الرئيسية">
+      <div class="stat"><div class="n" id="k-agents">0</div><div class="l">وكيل في المنظومة</div></div>
+      <div class="stat olive"><div class="n" id="k-active">0</div><div class="l">نشِط ويستلم مهاماً</div></div>
+      <div class="stat olive"><div class="n" id="k-working">0</div><div class="l">يعمل الآن</div></div>
+      <div class="stat"><div class="n" id="k-ready">0</div><div class="l">مهمة جاهزة للتنفيذ</div></div>
+      <div class="stat brass"><div class="n" id="k-pending">0</div><div class="l">ينتظر قرارك</div></div>
+      <div class="stat"><div class="n" id="k-merged">0</div><div class="l">دُمج في 7 أيام</div></div>
+    </section>
+
+    <nav class="pipeline" aria-label="مسار العمل">
+      <div class="stage"><div class="n" id="p-commands">0</div><div class="l">أوامرك المفتوحة</div></div>
+      <div class="stage"><div class="n" id="p-ready">0</div><div class="l">جاهزة</div></div>
+      <div class="stage"><div class="n" id="p-progress">0</div><div class="l">قيد العمل</div></div>
+      <div class="stage" id="p-review-box"><div class="n" id="p-review">0</div><div class="l">تنتظر دمجك</div></div>
+      <div class="stage"><div class="n" id="p-merged">0</div><div class="l">دُمجت هذا الأسبوع</div></div>
+    </nav>
+
+    <div class="grid">
+      <section class="panel map-panel" aria-labelledby="map-title">
+        <h2 id="map-title">القوة العاملة</h2>
+        <div id="depts" class="depts"></div>
+        <div class="legend">
+          <span><i class="dot working" aria-hidden="true"></i>يعمل الآن</span>
+          <span><i class="dot active" aria-hidden="true"></i>نشِط</span>
+          <span><i class="dot reading" aria-hidden="true"></i>قراءة فقط</span>
+          <span><i class="dot" aria-hidden="true"></i>مصمَّم، لم يبدأ</span>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="pending-title">
+        <h2 id="pending-title">ينتظر قرارك <span id="pending-count" class="count">0</span></h2>
+        <div id="pending"></div>
+      </section>
+
+      <section class="panel" aria-labelledby="feed-title">
+        <h2 id="feed-title">ما يحدث الآن</h2>
+        <div id="feed" class="feed"></div>
+      </section>
+    </div>
+
+    <div class="grid2">
+      <section class="panel brief-panel" aria-labelledby="brief-title">
+        <h2 id="brief-title">آخر تقرير <span id="brief-date" class="count"></span></h2>
+        <div id="brief" class="brief"></div>
+      </section>
+      <section class="panel" aria-labelledby="commands-title">
+        <h2 id="commands-title">أوامرك</h2>
+        <div id="commands"></div>
+      </section>
+      <section class="panel" aria-labelledby="human-title">
+        <h2 id="human-title">للفريق الميداني <span id="human-count" class="count">0</span></h2>
+        <div id="human"></div>
+      </section>
+    </div>
+
+    <footer>كل فعل هنا يُكتب في GitHub باسم حسابك. الموافقة على PR تعني دمجه.</footer>
+  </main>
+
+  <section class="command" aria-label="أمر جديد">
+    <div class="command-inner">
+      <div class="modes" role="group" aria-label="طريقة الإدخال">
+        <button id="mode-text" aria-pressed="true">نص</button>
+        <button id="mode-voice" aria-pressed="false">صوت</button>
+      </div>
+      <button id="mic" class="mic hidden" aria-label="ابدأ التسجيل" title="اضغط وتكلّم">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+      </button>
+      <textarea id="cmd-text" rows="1" placeholder="اكتب أمرك كما تقوله لمدير العمليات…" aria-label="نص الأمر"></textarea>
+      <select id="cmd-agent" aria-label="الوكيل"><option value="">رئيس العمليات يختار</option></select>
+      <select id="cmd-priority" aria-label="الأولوية"><option>عادية</option><option>عاجلة</option><option>عندما يتسع الوقت</option></select>
       <button id="cmd-send" class="btn primary">إرسال الأمر</button>
-      <span class="hint">يُفتح Issue بوسم command باسمك</span>
     </div>
   </section>
 
-  <div class="grid">
-    <section class="card" aria-labelledby="pending-title">
-      <h2 id="pending-title">ما ينتظرك <span id="pending-count" class="count">0</span></h2>
-      <div id="pending"></div>
-    </section>
-
-    <section class="card" aria-labelledby="agents-title">
-      <h2 id="agents-title">الوكلاء <span id="agents-count" class="count">0</span></h2>
-      <div id="agents"></div>
-    </section>
-
-    <section class="card" aria-labelledby="commands-title">
-      <h2 id="commands-title">أوامرك الأخيرة</h2>
-      <div id="commands"></div>
-    </section>
-
-    <section class="card" aria-labelledby="human-title">
-      <h2 id="human-title">مهام ميدانية مفتوحة <span id="human-count" class="count">0</span></h2>
-      <div id="human"></div>
-    </section>
-
-    <section class="card span2" aria-labelledby="log-title">
-      <h2 id="log-title">سجل النشاط</h2>
-      <div class="filters">
-        <select id="log-agent" aria-label="تصفية حسب الوكيل" class="btn small"><option value="">كل الوكلاء</option></select>
-      </div>
-      <div id="log" class="log"></div>
-    </section>
-
-    <section class="card span2" aria-labelledby="brief-title">
-      <h2 id="brief-title">آخر تقرير <span id="brief-date" class="pill muted"></span></h2>
-      <div id="brief" class="brief"></div>
-    </section>
-  </div>
-
-  <footer>كل فعل في هذه اللوحة يُكتب في GitHub باسم حسابك. الموافقة على PR تعني دمجه.</footer>
+  <div id="scrim" class="scrim"></div>
+  <aside id="drawer" class="drawer" aria-labelledby="dr-name" aria-hidden="true">
+    <button id="dr-close" class="btn small" style="float:left">إغلاق</button>
+    <h2 id="dr-name"></h2>
+    <div id="dr-sub" class="meta"></div>
+    <dl id="dr-facts"></dl>
+    <div class="actions"><button id="dr-command" class="btn primary">أعطه أمراً</button><a id="dr-file" class="btn small" target="_blank" rel="noopener noreferrer">ملف تعليماته</a></div>
+    <h3>مهامه المفتوحة</h3>
+    <div id="dr-tasks"></div>
+    <h3>آخر نشاطه</h3>
+    <div id="dr-activity" class="feed" style="max-height:none"></div>
+  </aside>
 </div>
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -200,7 +326,7 @@
 <div id="modal-back" class="modal-back" role="dialog" aria-modal="true" aria-labelledby="modal-title">
   <div class="modal">
     <h3 id="modal-title"></h3>
-    <div id="modal-body" class="empty"></div>
+    <div id="modal-body"></div>
     <textarea id="modal-input" class="hidden"></textarea>
     <div class="actions">
       <button id="modal-ok" class="btn primary">تأكيد</button>
@@ -216,31 +342,26 @@
   const KEY_TOKEN = 'os-console.token';
   const KEY_REPO = 'os-console.repo';
   const MARK = '— من لوحة OS';
+  const DEPT_ORDER = ['leadership', 'customers-growth', 'operations-support', 'product-engineering', 'market-regulatory', 'sourcing-partners', 'finance'];
   const DEPT_AR = {
-    'leadership': 'القيادة',
-    'market-regulatory': 'السوق والتنظيم',
-    'product-engineering': 'المنتج والهندسة',
-    'finance': 'المالية',
-    'sourcing-partners': 'التوريد والشركاء',
-    'operations-support': 'العمليات والدعم',
-    'customers-growth': 'العملاء والنمو'
+    'leadership': 'القيادة', 'market-regulatory': 'السوق والتنظيم', 'product-engineering': 'المنتج والهندسة',
+    'finance': 'المالية', 'sourcing-partners': 'التوريد والشركاء', 'operations-support': 'العمليات والدعم', 'customers-growth': 'العملاء والنمو'
   };
-  const STAGE_AR = {
-    'designed': ['مصمَّم', 'muted'],
-    'read-only': ['قراءة فقط', 'blue'],
-    'write-with-approval': ['يكتب بموافقة', 'wait'],
-    'live': ['LIVE', 'ok']
+  const TRIGGER_AR = {
+    'assigned-by-head-of-ops': 'بمهمة من رئيس العمليات', 'run-now': 'Run now يدوياً', 'api-optional': 'API اختياري',
+    'schedule-0740-amsterdam': '07:40 أمستردام', 'schedule-1940-amsterdam': '19:40 أمستردام', 'schedule-weekly': 'أسبوعياً',
+    'schedule-every-2h-0910-2310-amsterdam': 'كل ساعتين من 09:10 إلى 23:10', 'pull-request-opened': 'عند فتح PR',
+    'issue-labeled-product': 'عند وسم Issue بـ product', 'issue-labeled-ready-to-build': 'عند وسم ready-to-build'
   };
+  const STAGE_AR = { 'designed': 'مصمَّم', 'read-only': 'قراءة فقط', 'write-with-approval': 'نشِط', 'live': 'LIVE' };
 
-  let token = '';
-  let repo = '';
+  let token = '', repo = '';
   let agentLabels = new Set();
   let refreshing = false;
-  let state = { agents: [], log: [] };
-
+  const state = { agents: [], log: [], openIssues: [], working: {}, openBy: {} };
   const $ = (id) => document.getElementById(id);
 
-  // ---------- storage (may be unavailable) ----------
+  // ---------- storage ----------
   function store(kind) { try { return kind === 'local' ? window.localStorage : window.sessionStorage; } catch (e) { return null; } }
   function readSaved() {
     for (const kind of ['local', 'session']) {
@@ -263,25 +384,13 @@
 
   // ---------- GitHub REST ----------
   async function gh(path, opts = {}) {
-    const headers = {
-      'Authorization': 'Bearer ' + token,
-      'Accept': opts.accept || 'application/vnd.github+json',
-      'X-GitHub-Api-Version': '2022-11-28'
-    };
+    const headers = { 'Authorization': 'Bearer ' + token, 'Accept': opts.accept || 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
     if (opts.body !== undefined) headers['Content-Type'] = 'application/json';
-    const res = await fetch(API + path, {
-      method: opts.method || 'GET',
-      headers,
-      body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
-      cache: 'no-store',
-      referrerPolicy: 'no-referrer'
-    });
+    const res = await fetch(API + path, { method: opts.method || 'GET', headers, body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined, cache: 'no-store', referrerPolicy: 'no-referrer' });
     if (!res.ok) {
       let msg = res.statusText;
       try { const j = await res.json(); if (j && j.message) msg = j.message; } catch (e) { /* ignore */ }
-      const err = new Error(explain(res.status, msg));
-      err.status = res.status;
-      throw err;
+      const err = new Error(explain(res.status, msg)); err.status = res.status; throw err;
     }
     if (res.status === 204) return null;
     if (opts.raw) return res.text();
@@ -289,22 +398,18 @@
     return ct.includes('json') ? res.json() : res.text();
   }
   function explain(status, msg) {
-    if (status === 401) return 'الرمز غير صالح أو منتهي (401).';
-    if (status === 403) return 'الرمز لا يملك هذه الصلاحية (403): ' + msg;
-    if (status === 404) return 'غير موجود، أو الرمز لا يصل إلى هذا المستودع (404).';
-    if (status === 405) return 'GitHub رفض الدمج (405): ' + msg;
-    if (status === 409) return 'تعارض (409): ' + msg;
-    if (status === 422) return 'طلب غير مقبول (422): ' + msg;
+    if (status === 401) return 'الرمز غير صالح أو انتهت مدته.';
+    if (status === 403) return 'الرمز لا يملك هذه الصلاحية: ' + msg;
+    if (status === 404) return 'غير موجود، أو الرمز لا يصل إلى هذا المستودع.';
+    if (status === 405) return 'GitHub رفض الدمج: ' + msg;
+    if (status === 409) return 'تعارض: ' + msg;
+    if (status === 422) return 'طلب غير مقبول: ' + msg;
     return status + ': ' + msg;
   }
   const rp = () => '/repos/' + repo.split('/').map(encodeURIComponent).join('/');
   async function rawFile(path) {
-    try {
-      return await gh(rp() + '/contents/' + path.split('/').map(encodeURIComponent).join('/'), { accept: 'application/vnd.github.raw+json', raw: true });
-    } catch (e) {
-      if (e.status === 404) return null;
-      throw e;
-    }
+    try { return await gh(rp() + '/contents/' + path.split('/').map(encodeURIComponent).join('/'), { accept: 'application/vnd.github.raw+json', raw: true }); }
+    catch (e) { if (e.status === 404) return null; throw e; }
   }
 
   // ---------- helpers ----------
@@ -320,16 +425,12 @@
     for (const k of kids.flat()) if (k !== null && k !== undefined && k !== false) n.append(k.nodeType ? k : document.createTextNode(String(k)));
     return n;
   }
-  function link(href, text) {
-    const safe = /^https:\/\//.test(href) ? href : '#';
-    return el('a', { href: safe, target: '_blank', rel: 'noopener noreferrer', text });
-  }
+  function link(href, text) { return el('a', { href: /^https:\/\//.test(href) ? href : '#', target: '_blank', rel: 'noopener noreferrer', text }); }
+  const iso = (n) => '⁨#' + n + '⁩';
   const rtf = (() => { try { return new Intl.RelativeTimeFormat('ar', { numeric: 'auto' }); } catch (e) { return null; } })();
-  function ago(iso) {
-    const t = Date.parse(iso);
-    if (!t) return '';
-    const s = Math.round((t - Date.now()) / 1000);
-    const a = Math.abs(s);
+  function ago(when) {
+    const t = Date.parse(when); if (!t) return '';
+    const s = Math.min(0, Math.round((t - Date.now()) / 1000)), a = Math.abs(s);
     if (!rtf) return new Date(t).toLocaleString('ar');
     if (a < 60) return rtf.format(s, 'second');
     if (a < 3600) return rtf.format(Math.round(s / 60), 'minute');
@@ -338,40 +439,27 @@
   }
   let toastTimer = 0;
   function toast(msg, href) {
-    const t = $('toast');
-    t.replaceChildren(msg);
-    if (href) t.append(' ', link(href, 'فتح'));
-    t.style.display = 'block';
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { t.style.display = 'none'; }, 7000);
+    const t = $('toast'); t.replaceChildren(msg); if (href) t.append(' ', link(href, 'فتح'));
+    t.style.display = 'block'; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.style.display = 'none'; }, 7000);
   }
   function modal({ title, body, input, okText, okClass }) {
     return new Promise((resolve) => {
-      $('modal-title').textContent = title;
-      $('modal-body').textContent = body || '';
-      const inp = $('modal-input');
-      inp.classList.toggle('hidden', !input);
-      inp.value = '';
-      inp.placeholder = input || '';
-      const ok = $('modal-ok');
-      ok.textContent = okText || 'تأكيد';
-      ok.className = 'btn ' + (okClass || 'primary');
-      const back = $('modal-back');
-      back.style.display = 'flex';
+      $('modal-title').textContent = title; $('modal-body').textContent = body || '';
+      const inp = $('modal-input'); inp.classList.toggle('hidden', !input); inp.value = ''; inp.placeholder = input || '';
+      const ok = $('modal-ok'); ok.textContent = okText || 'تأكيد'; ok.className = 'btn ' + (okClass || 'primary');
+      const back = $('modal-back'); back.style.display = 'flex';
       const done = (v) => { back.style.display = 'none'; ok.onclick = null; $('modal-cancel').onclick = null; resolve(v); };
-      ok.onclick = () => {
-        if (input && !inp.value.trim()) { inp.focus(); return; }
-        done(input ? inp.value.trim() : true);
-      };
+      ok.onclick = () => { if (input && !inp.value.trim()) { inp.focus(); return; } done(input ? inp.value.trim() : true); };
       $('modal-cancel').onclick = () => done(null);
       (input ? inp : ok).focus();
     });
   }
-  function onKeyEsc(e) { if (e.key === 'Escape' && $('modal-back').style.display === 'flex') $('modal-cancel').click(); }
+  const hasLabel = (i, name) => (i.labels || []).some((l) => (typeof l === 'string' ? l : l.name) === name);
+  const labelNames = (i) => (i.labels || []).map((l) => (typeof l === 'string' ? l : l.name));
 
-  // ---------- registry.yaml (fixed, simple format) ----------
+  // ---------- registry.yaml ----------
   function parseScalar(v) {
-    v = v.trim();
+    v = v.replace(/\s+#.*$/, '').trim();
     if (v === '' || v === 'null' || v === '~') return null;
     if (/^\[.*\]$/.test(v)) return v.slice(1, -1).split(',').map((x) => x.trim()).filter(Boolean).map(unquote);
     if (/^-?\d+(\.\d+)?$/.test(v)) return Number(v);
@@ -379,65 +467,24 @@
   }
   function unquote(v) { return /^(["']).*\1$/.test(v) ? v.slice(1, -1) : v; }
   function parseRegistry(text) {
-    const agents = [];
-    let cur = null;
+    const agents = []; let cur = null;
     for (const line of text.split(/\r?\n/)) {
       if (/^\s*#/.test(line) || !line.trim()) continue;
       let m = line.match(/^\s*-\s+id:\s*(.+)$/);
       if (m) { cur = { id: parseScalar(m[1]) }; agents.push(cur); continue; }
       m = line.match(/^\s{4}([a-z_]+):\s*(.*)$/);
-      if (cur && m) cur[m[1]] = parseScalar(m[2]);
+      if (cur && m) cur[m[1]] = m[1] === 'promotion_gate' || m[1] === 'human_counterpart' ? unquote(m[2].trim()) : parseScalar(m[2]);
     }
     return agents;
   }
-
-  // ---------- data ----------
-  async function loadAll() {
-    if (refreshing) return;
-    refreshing = true;
-    $('refresh-btn').disabled = true;
-    try {
-      const [registryText, logText, openIssues, pulls, commands, briefsDir, recentComments] = await Promise.all([
-        rawFile('agents/registry.yaml'),
-        rawFile('ops/activity-log.jsonl'),
-        gh(rp() + '/issues?state=open&per_page=100'),
-        gh(rp() + '/pulls?state=open&per_page=50'),
-        gh(rp() + '/issues?state=all&labels=command&per_page=12&sort=created&direction=desc'),
-        gh(rp() + '/contents/ops/briefs').catch((e) => (e.status === 404 ? [] : Promise.reject(e))),
-        gh(rp() + '/issues/comments?sort=created&direction=desc&per_page=60').catch(() => [])
-      ]);
-      state.agents = registryText ? parseRegistry(registryText) : [];
-      state.log = mergeLog(parseLog(logText || ''), agentComments(recentComments));
-      const issuesOnly = openIssues.filter((i) => !i.pull_request);
-      renderAgents(issuesOnly);
-      renderAgentSelects();
-      renderLog();
-      renderCommands(commands.filter((i) => !i.pull_request));
-      renderHuman(issuesOnly.filter((i) => hasLabel(i, 'human-task')));
-      await renderPending(pulls, issuesOnly.filter((i) => hasLabel(i, 'needs-founder-approval')));
-      const briefIssue = openIssues.find((i) => !i.pull_request && hasLabel(i, 'brief'));
-      await renderBrief(Array.isArray(briefsDir) ? briefsDir : [], briefIssue);
-      $('refreshed').textContent = 'آخر تحديث ' + new Date().toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit' });
-      $('load-error').classList.add('hidden');
-    } catch (e) {
-      if (e.status === 401) { forget(); showSetup('الرمز لم يعد صالحاً. أنشئ رمزاً جديداً والصقه هنا.'); }
-      else { const b = $('load-error'); b.textContent = 'تعذّر تحميل البيانات: ' + e.message + ' — اضغط «تحديث» للمحاولة مجدداً.'; b.classList.remove('hidden'); }
-    } finally {
-      refreshing = false;
-      $('refresh-btn').disabled = false;
-    }
-  }
-  const hasLabel = (i, name) => (i.labels || []).some((l) => (typeof l === 'string' ? l : l.name) === name);
   function parseLog(text) {
     const out = [];
     for (const line of text.split(/\r?\n/)) {
       if (!line.trim()) continue;
       try { const j = JSON.parse(line); if (j && typeof j === 'object') out.push(j); } catch (e) { out.push({ ts: '', agent: '?', action: line, invalid: true }); }
     }
-    return out.reverse();
+    return out;
   }
-
-  // Agent comments start with "🤖 <agent-id> · <one line>": they are the live activity log.
   function agentComments(list) {
     const out = [];
     for (const c of Array.isArray(list) ? list : []) {
@@ -449,90 +496,136 @@
     }
     return out;
   }
-  function mergeLog(fileLog, live) {
-    return [...live, ...fileLog].sort((a, b) => (Date.parse(b.ts) || 0) - (Date.parse(a.ts) || 0));
-  }
+  const byNewest = (a, b) => (Date.parse(b.ts) || 0) - (Date.parse(a.ts) || 0);
+  function nameOf(id) { const a = state.agents.find((x) => x.id === id); return a ? (a.name_ar || id) : (id === 'claude-setup' ? 'الإعداد' : id); }
 
-  // ---------- render: agents ----------
-  function renderAgents(openIssues) {
-    const box = $('agents');
-    const agents = state.agents;
-    $('agents-count').textContent = agents.length;
-    if (!agents.length) { box.replaceChildren(el('div', { class: 'empty', text: 'لم يُعثر على agents/registry.yaml.' })); return; }
-    const lastBy = {};
-    for (const e of state.log) if (e.agent && !lastBy[e.agent]) lastBy[e.agent] = e;
-    const openBy = {};
-    for (const i of openIssues) for (const l of i.labels || []) {
-      const n = typeof l === 'string' ? l : l.name;
-      if (n && n.startsWith('agent:')) openBy[n.slice(6)] = (openBy[n.slice(6)] || 0) + 1;
-    }
-    const row = (a) => {
-      const [stageText, stageClass] = STAGE_AR[a.stage] || [String(a.stage || '—'), 'muted'];
-      const last = lastBy[a.id];
-      const open = openBy[a.id] || 0;
-      return el('div', { class: 'agent' },
-        el('div', null, el('span', { class: 'name', text: a.name_ar || a.id }), ' ', el('span', { class: 'meta', style: 'display:inline', text: '· الموجة ' + (a.wave ?? '?') })),
-        el('div', null, open ? el('span', { class: 'pill blue', text: open + ' مهمة' }) : null, ' ', el('span', { class: 'pill ' + stageClass, text: stageText })),
-        el('div', { class: 'last', text: last ? ('آخر نشاط ' + ago(last.ts) + ': ' + (last.action || '')) : 'لا نشاط بعد' + (a.human_counterpart ? ' · يعمل مع: ' + a.human_counterpart : '') })
-      );
-    };
-    const grouped = (list) => {
-      const groups = new Map();
-      for (const a of list) {
-        const d = a.department || 'other';
-        if (!groups.has(d)) groups.set(d, []);
-        groups.get(d).push(a);
+  // ---------- data ----------
+  async function loadAll() {
+    if (refreshing) return;
+    refreshing = true; $('refresh-btn').disabled = true;
+    try {
+      const [registryText, logText, openIssues, pulls, commands, briefsDir, recentComments, closedPulls] = await Promise.all([
+        rawFile('agents/registry.yaml'),
+        rawFile('ops/activity-log.jsonl'),
+        gh(rp() + '/issues?state=open&per_page=100'),
+        gh(rp() + '/pulls?state=open&per_page=50'),
+        gh(rp() + '/issues?state=all&labels=command&per_page=12&sort=created&direction=desc'),
+        gh(rp() + '/contents/ops/briefs').catch((e) => (e.status === 404 ? [] : Promise.reject(e))),
+        gh(rp() + '/issues/comments?sort=created&direction=desc&per_page=60').catch(() => []),
+        gh(rp() + '/pulls?state=closed&sort=updated&direction=desc&per_page=50').catch(() => [])
+      ]);
+      state.agents = registryText ? parseRegistry(registryText) : [];
+      state.log = [...agentComments(recentComments), ...parseLog(logText || '')].sort(byNewest);
+      const issues = openIssues.filter((i) => !i.pull_request);
+      state.openIssues = issues;
+      state.working = {}; state.openBy = {};
+      for (const i of issues) for (const n of labelNames(i)) {
+        if (!n.startsWith('agent:')) continue;
+        const id = n.slice(6);
+        (state.openBy[id] = state.openBy[id] || []).push(i);
+        if (hasLabel(i, 'in-progress')) state.working[id] = i;
       }
-      return [...groups].map(([d, l]) => el('div', { class: 'dept' }, el('h3', { text: DEPT_AR[d] || d }), l.map(row)));
-    };
-    const active = agents.filter((a) => a.wave === 1 || (a.stage && a.stage !== 'designed') || openBy[a.id]);
-    const later = agents.filter((a) => !active.includes(a));
-    const byStage = {};
-    for (const a of agents) byStage[a.stage] = (byStage[a.stage] || 0) + 1;
-    const summary = el('div', { class: 'meta', style: 'margin-bottom:10px' },
-      ...Object.keys(STAGE_AR).filter((k) => byStage[k]).map((k) => el('span', { class: 'pill ' + STAGE_AR[k][1], text: STAGE_AR[k][0] + ': ' + byStage[k] })));
-    const frag = [summary, ...grouped(active)];
-    if (later.length) {
-      frag.push(el('details', { class: 'dept' },
-        el('summary', { class: 'meta', style: 'cursor:pointer', text: 'وكلاء الموجتين 2 و3 (' + later.length + ')، مصمَّمون ولم يُبنوا بعد' }),
-        grouped(later)));
-    }
-    box.replaceChildren(...frag);
+      const weekAgo = Date.now() - 7 * 864e5;
+      const merged7 = closedPulls.filter((p) => p.merged_at && Date.parse(p.merged_at) >= weekAgo).length;
+      const ready = issues.filter((i) => hasLabel(i, 'ready')).length;
+      const inProgress = issues.filter((i) => hasLabel(i, 'in-progress')).length;
+      const openCommands = issues.filter((i) => hasLabel(i, 'command')).length;
+      const approvals = issues.filter((i) => hasLabel(i, 'needs-founder-approval'));
+      const active = state.agents.filter((a) => a.stage === 'write-with-approval' || a.stage === 'live').length;
+
+      setNum('k-agents', state.agents.length); setNum('k-active', active); setNum('k-working', Object.keys(state.working).length);
+      setNum('k-ready', ready); setNum('k-pending', pulls.length + approvals.length); setNum('k-merged', merged7);
+      setNum('p-commands', openCommands); setNum('p-ready', ready); setNum('p-progress', inProgress); setNum('p-review', pulls.length); setNum('p-merged', merged7);
+      $('p-review-box').classList.toggle('hot', pulls.length > 0);
+
+      renderMap();
+      renderAgentSelect();
+      renderFeed();
+      renderCommands(commands.filter((i) => !i.pull_request));
+      renderHuman(issues.filter((i) => hasLabel(i, 'human-task')));
+      await renderPending(pulls, approvals);
+      await renderBrief(Array.isArray(briefsDir) ? briefsDir : [], issues.find((i) => hasLabel(i, 'brief')));
+      $('refreshed').textContent = 'محدَّث ' + new Date().toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit' });
+      $('live-dot').className = 'pulse-dot';
+      $('load-error').classList.add('hidden');
+    } catch (e) {
+      $('live-dot').className = 'pulse-dot err';
+      if (e.status === 401) { forget(); showSetup('الرمز لم يعد صالحاً. أنشئ رمزاً جديداً والصقه هنا.'); }
+      else { const b = $('load-error'); b.textContent = 'تعذّر تحميل البيانات: ' + e.message + ' اضغط «تحديث» للمحاولة مجدداً.'; b.classList.remove('hidden'); }
+    } finally { refreshing = false; $('refresh-btn').disabled = false; }
   }
-  function renderAgentSelects() {
-    const sel = $('cmd-agent');
-    const keep = sel.value;
-    sel.replaceChildren(el('option', { value: '', text: 'رئيس العمليات يقرر لمن' }));
-    for (const a of state.agents) sel.append(el('option', { value: a.id, text: a.name_ar || a.id }));
+  function setNum(id, n) { $(id).textContent = String(n); }
+
+  // ---------- workforce map ----------
+  function agentStatus(a) {
+    if (state.working[a.id]) return ['working', 'يعمل الآن'];
+    if (a.stage === 'write-with-approval' || a.stage === 'live') return ['active', STAGE_AR[a.stage]];
+    if (a.stage === 'read-only') return ['reading', STAGE_AR[a.stage]];
+    return ['', STAGE_AR[a.stage] || String(a.stage || 'مصمَّم')];
+  }
+  function renderMap() {
+    const box = $('depts');
+    if (!state.agents.length) { box.replaceChildren(el('div', { class: 'empty', text: 'لم يُعثر على agents/registry.yaml.' })); return; }
+    const groups = new Map();
+    for (const a of state.agents) { const d = a.department || 'other'; if (!groups.has(d)) groups.set(d, []); groups.get(d).push(a); }
+    const order = [...groups.keys()].sort((x, y) => (DEPT_ORDER.indexOf(x) + 1 || 99) - (DEPT_ORDER.indexOf(y) + 1 || 99));
+    box.replaceChildren(...order.map((d) => {
+      const list = groups.get(d);
+      const live = list.filter((a) => agentStatus(a)[0] === 'working' || agentStatus(a)[0] === 'active').length;
+      return el('div', { class: 'dept' },
+        el('div', { class: 'dept-head' }, el('h3', { text: DEPT_AR[d] || d }), el('span', { text: live + ' من ' + list.length + ' نشِط' })),
+        list.map((a) => {
+          const [cls, label] = agentStatus(a);
+          const w = state.working[a.id];
+          const open = (state.openBy[a.id] || []).length;
+          return el('button', { class: 'agent', type: 'button', onclick: () => openDrawer(a.id), 'aria-label': (a.name_ar || a.id) + '، ' + label },
+            el('i', { class: 'dot ' + cls, 'aria-hidden': 'true' }),
+            el('span', { class: 'name', text: a.name_ar || a.id }),
+            el('span', { class: 'state', text: open && !w ? label + '، ' + open + ' مهمة' : label }),
+            w ? el('span', { class: 'task', text: w.title }) : null
+          );
+        })
+      );
+    }));
+  }
+  function renderAgentSelect() {
+    const sel = $('cmd-agent'); const keep = sel.value;
+    sel.replaceChildren(el('option', { value: '', text: 'رئيس العمليات يختار' }), ...state.agents.filter((a) => a.id !== 'executor').map((a) => el('option', { value: a.id, text: a.name_ar || a.id })));
     sel.value = keep;
-    const lf = $('log-agent');
-    const keepL = lf.value;
-    const ids = [...new Set(state.log.map((e) => e.agent).filter(Boolean))];
-    lf.replaceChildren(el('option', { value: '', text: 'كل الوكلاء' }), ...ids.map((id) => el('option', { value: id, text: nameOf(id) })));
-    lf.value = ids.includes(keepL) ? keepL : '';
-  }
-  function nameOf(id) { const a = state.agents.find((x) => x.id === id); return a ? (a.name_ar || id) : id; }
-
-  // ---------- render: log ----------
-  function renderLog() {
-    const f = $('log-agent').value;
-    const items = state.log.filter((e) => !f || e.agent === f).slice(0, 60);
-    const box = $('log');
-    if (!items.length) { box.replaceChildren(el('div', { class: 'empty', text: 'السجل فارغ.' })); return; }
-    box.replaceChildren(...items.map((e) => el('div', { class: 'entry' },
-      el('div', { class: 'meta' },
-        el('span', { class: 'pill ' + (e.invalid ? 'fail' : 'muted'), text: e.invalid ? 'سطر غير صالح' : nameOf(e.agent || '?') }),
-        el('span', { text: e.ts ? ago(e.ts) : '' }),
-        e.url ? link(e.url, String(e.ref || 'فتح')) : (e.ref ? el('span', { class: 'ltr', text: String(e.ref) }) : null)
-      ),
-      el('div', { class: 'what', text: String(e.action || '') }),
-      e.reason ? el('div', { class: 'meta what', text: 'السبب: ' + e.reason }) : null
-    )));
   }
 
-  // ---------- render: pending (PRs + issues needing approval) ----------
-  // Check status for a PR. Uses check-runs when the token may read checks;
-  // otherwise falls back to the PR's mergeable_state (needs only Pull requests: read).
+  // ---------- drawer ----------
+  function openDrawer(id) {
+    const a = state.agents.find((x) => x.id === id); if (!a) return;
+    const [, label] = agentStatus(a);
+    $('dr-name').textContent = a.name_ar || a.id;
+    $('dr-sub').replaceChildren(el('span', { text: DEPT_AR[a.department] || a.department || '' }), el('span', { text: 'الموجة ' + (a.wave ?? '?') }), el('span', { class: 'tag ' + (label === 'يعمل الآن' || label === 'نشِط' || label === 'LIVE' ? 'ok' : label === 'قراءة فقط' ? 'wait' : ''), text: label }));
+    const facts = [['يعمل مع', a.human_counterpart], ['يعمل عند', Array.isArray(a.triggers) && a.triggers.length ? a.triggers.map((t) => TRIGGER_AR[t] || t).join('، ') : 'بمهمة من رئيس العمليات'], ['بوابة الانتقال', a.promotion_gate], ['المعرّف', a.id]];
+    $('dr-facts').replaceChildren(...facts.filter(([, v]) => v).flatMap(([k, v]) => [el('dt', { text: k }), el('dd', { class: k === 'المعرّف' ? 'ltr' : null, text: String(v) })]));
+    const file = $('dr-file');
+    if (a.file) { file.href = 'https://github.com/' + repo + '/blob/main/' + a.file; file.classList.remove('hidden'); } else file.classList.add('hidden');
+    $('dr-command').onclick = () => { closeDrawer(); $('cmd-agent').value = a.id; $('cmd-text').focus(); };
+    const tasks = state.openBy[a.id] || [];
+    $('dr-tasks').replaceChildren(...(tasks.length ? tasks.map((i) => el('div', { class: 'item' }, el('div', { class: 'title' }, link(i.html_url, i.title)), el('div', { class: 'meta' }, el('span', { text: iso(i.number) }), ...labelNames(i).filter((n) => ['ready', 'in-progress', 'in-review', 'blocked', 'needs-founder-approval'].includes(n)).map((n) => el('span', { class: 'tag ' + (n === 'in-progress' ? 'ok' : n === 'blocked' ? 'fail' : 'wait'), text: n }))))) : [el('div', { class: 'empty', text: 'لا مهام مفتوحة.' })]));
+    const acts = state.log.filter((e) => e.agent === a.id).slice(0, 10);
+    $('dr-activity').replaceChildren(...(acts.length ? acts.map(feedEntry) : [el('div', { class: 'empty', text: 'لا نشاط بعد.' })]));
+    $('scrim').style.display = 'block'; $('drawer').classList.add('open'); $('drawer').setAttribute('aria-hidden', 'false'); $('dr-close').focus();
+  }
+  function closeDrawer() { $('scrim').style.display = 'none'; $('drawer').classList.remove('open'); $('drawer').setAttribute('aria-hidden', 'true'); }
+
+  // ---------- feed ----------
+  function feedEntry(e) {
+    return el('div', { class: 'entry' + (e.live ? ' live' : '') },
+      el('div', { class: 'meta' }, el('span', { class: 'who', text: e.invalid ? 'سطر غير صالح' : nameOf(e.agent || '?') }), el('span', { text: e.ts ? ago(e.ts) : '' }), e.url ? link(e.url, e.ref || 'فتح') : (e.ref ? el('span', { class: 'ltr', text: String(e.ref) }) : null)),
+      el('div', { class: 'what', text: String(e.action || '') })
+    );
+  }
+  function renderFeed() {
+    const items = state.log.slice(0, 50);
+    $('feed').replaceChildren(...(items.length ? items.map(feedEntry) : [el('div', { class: 'empty', text: 'لا نشاط بعد.' })]));
+  }
+
+  // ---------- pending ----------
   async function checksFor(p) {
     try {
       const r = await gh(rp() + '/commits/' + encodeURIComponent(p.head.sha) + '/check-runs?per_page=50');
@@ -542,89 +635,64 @@
         if (runs.every((c) => ['success', 'neutral', 'skipped'].includes(c.conclusion))) return ['الفحوص ناجحة', 'ok', true];
         return ['فحص فاشل', 'fail', false];
       }
-    } catch (e) { /* no Checks permission: fall back below */ }
+    } catch (e) { /* no Checks permission */ }
     try {
       const d = await gh(rp() + '/pulls/' + p.number);
       switch (d.mergeable_state) {
-        case 'clean': return ['جاهز للدمج', 'ok', true];
-        case 'has_hooks': return ['جاهز للدمج', 'ok', true];
+        case 'clean': case 'has_hooks': return ['جاهز للدمج', 'ok', true];
         case 'unstable': return ['فحص فاشل', 'fail', false];
-        case 'blocked': return ['ينتظر الفحوص أو القواعد', 'wait', false];
+        case 'blocked': return ['ينتظر الفحوص', 'wait', false];
         case 'dirty': return ['تعارض مع الفرع الرئيسي', 'fail', false];
         case 'behind': return ['متأخر عن الفرع الرئيسي', 'wait', true];
-        case 'draft': return ['مسودة', 'muted', false];
+        case 'draft': return ['مسودة', '', false];
         default: return ['الحالة تُحسب الآن', 'wait', true];
       }
-    } catch (e) { return ['الحالة غير معروفة', 'muted', true]; }
+    } catch (e) { return ['الحالة غير معروفة', '', true]; }
   }
   async function renderPending(pulls, issues) {
-    const box = $('pending');
     const total = pulls.length + issues.length;
-    const c = $('pending-count');
-    c.textContent = total;
-    c.classList.toggle('hot', total > 0);
+    const c = $('pending-count'); c.textContent = total; c.classList.toggle('brass', total > 0);
+    const box = $('pending');
     if (!total) { box.replaceChildren(el('div', { class: 'empty', text: 'لا شيء ينتظرك الآن.' })); return; }
-    const checks = await Promise.all(pulls.map((p) => checksFor(p)));
-    const items = [];
-    pulls.forEach((p, k) => {
-      const [ct, cc, mergeable] = checks[k];
-      items.push(el('div', { class: 'item' },
+    const checks = await Promise.all(pulls.map(checksFor));
+    const items = pulls.map((p, k) => {
+      const [ct, cc, ok] = checks[k];
+      return el('div', { class: 'item' },
         el('div', { class: 'title' }, link(p.html_url, p.title)),
-        el('div', { class: 'meta' },
-          el('span', { class: 'pill blue', text: 'PR \u2068#' + p.number + '\u2069' }),
-          el('span', { class: 'pill ' + cc, text: ct }),
-          p.draft ? el('span', { class: 'pill muted', text: 'مسودة' }) : null,
-          el('span', { class: 'ltr', text: p.head.ref }),
-          el('span', { text: ago(p.created_at) })
-        ),
+        el('div', { class: 'meta' }, el('span', { class: 'tag', text: 'PR ' + iso(p.number) }), el('span', { class: 'tag ' + cc, text: ct }), el('span', { text: ago(p.created_at) })),
         el('div', { class: 'actions' },
-          el('button', { class: 'btn good small', disabled: p.draft || !mergeable ? true : null, title: !mergeable ? 'انتظر نجاح الفحوص' : null, onclick: () => approvePR(p) }, 'موافقة ودمج'),
-          el('button', { class: 'btn small', onclick: () => requestChanges(p.number, 'PR') }, 'طلب تعديل')
-        )
-      ));
+          el('button', { class: 'btn go small', disabled: p.draft || !ok ? true : null, onclick: () => approvePR(p) }, 'موافقة ودمج'),
+          el('button', { class: 'btn small', onclick: () => requestChanges(p.number, 'PR') }, 'طلب تعديل'))
+      );
     });
-    for (const i of issues) {
-      items.push(el('div', { class: 'item' },
-        el('div', { class: 'title' }, link(i.html_url, i.title)),
-        el('div', { class: 'meta' },
-          el('span', { class: 'pill wait', text: 'قرار \u2068#' + i.number + '\u2069' }),
-          el('span', { text: ago(i.created_at) })
-        ),
-        el('div', { class: 'actions' },
-          el('button', { class: 'btn good small', onclick: () => approveIssue(i) }, 'موافق'),
-          el('button', { class: 'btn bad small', onclick: () => rejectIssue(i) }, 'رفض'),
-          el('button', { class: 'btn small', onclick: () => requestChanges(i.number, 'Issue') }, 'تعليق')
-        )
-      ));
-    }
+    for (const i of issues) items.push(el('div', { class: 'item' },
+      el('div', { class: 'title' }, link(i.html_url, i.title)),
+      el('div', { class: 'meta' }, el('span', { class: 'tag wait', text: 'قرار ' + iso(i.number) }), el('span', { text: ago(i.created_at) })),
+      el('div', { class: 'actions' },
+        el('button', { class: 'btn go small', onclick: () => approveIssue(i) }, 'موافق'),
+        el('button', { class: 'btn stop small', onclick: () => rejectIssue(i) }, 'رفض'),
+        el('button', { class: 'btn small', onclick: () => requestChanges(i.number, 'Issue') }, 'تعليق'))
+    ));
     box.replaceChildren(...items);
   }
 
-  // ---------- render: commands, human tasks ----------
+  // ---------- commands, human tasks ----------
   function renderCommands(list) {
     const box = $('commands');
-    if (!list.length) { box.replaceChildren(el('div', { class: 'empty', text: 'لم ترسل أوامر بعد.' })); return; }
+    if (!list.length) { box.replaceChildren(el('div', { class: 'empty', text: 'لم ترسل أوامر بعد. اكتب أمرك في الشريط أسفل الصفحة.' })); return; }
     box.replaceChildren(...list.map((i) => el('div', { class: 'item' },
       el('div', { class: 'title' }, link(i.html_url, i.title)),
-      el('div', { class: 'meta' },
-        el('span', { class: 'pill ' + (i.state === 'open' ? 'wait' : 'ok'), text: i.state === 'open' ? 'مفتوح' : 'مُغلق' }),
-        el('span', { text: '#' + i.number }),
-        el('span', { text: ago(i.created_at) }),
-        i.comments ? el('span', { text: i.comments + ' تعليق' }) : null
-      )
+      el('div', { class: 'meta' }, el('span', { class: 'tag ' + (i.state === 'open' ? 'wait' : 'ok'), text: i.state === 'open' ? 'قيد المتابعة' : 'أُغلق' }), el('span', { text: iso(i.number) }), el('span', { text: ago(i.created_at) }), i.comments ? el('span', { text: i.comments + ' تعليق' }) : null)
     )));
   }
   function renderHuman(list) {
     $('human-count').textContent = list.length;
     const box = $('human');
-    if (!list.length) { box.replaceChildren(el('div', { class: 'empty', text: 'لا مهام ميدانية مفتوحة.' })); return; }
-    box.replaceChildren(...list.map((i) => el('div', { class: 'item' },
-      el('div', { class: 'title' }, link(i.html_url, i.title)),
-      el('div', { class: 'meta' }, el('span', { text: '#' + i.number }), el('span', { text: ago(i.created_at) }))
-    )));
+    if (!list.length) { box.replaceChildren(el('div', { class: 'empty', text: 'لا مهام ميدانية مفتوحة. تظهر هنا حين يحتاج عمل حضوراً على الأرض.' })); return; }
+    box.replaceChildren(...list.map((i) => el('div', { class: 'item' }, el('div', { class: 'title' }, link(i.html_url, i.title)), el('div', { class: 'meta' }, el('span', { text: iso(i.number) }), el('span', { text: ago(i.created_at) })))));
   }
 
-  // ---------- render: latest brief (tiny, safe markdown) ----------
+  // ---------- brief ----------
   async function renderBrief(dir, briefIssue) {
     const box = $('brief');
     if (briefIssue && briefIssue.comments > 0) {
@@ -632,39 +700,34 @@
       const page = await gh(rp() + '/issues/' + briefIssue.number + '/comments?per_page=100&page=' + last).catch(() => []);
       const c = Array.isArray(page) && page.length ? page[page.length - 1] : null;
       if (c) {
-        $('brief-date').textContent = new Date(c.created_at).toLocaleString('ar', { dateStyle: 'medium', timeStyle: 'short' });
-        box.replaceChildren(...mdToNodes(String(c.body || '')), el('p', null, link(c.html_url, 'فتح في GitHub'), ' · ', link(briefIssue.html_url, 'كل التقارير')));
+        $('brief-date').textContent = ago(c.created_at);
+        box.replaceChildren(...mdToNodes(String(c.body || '').replace(/^\s*🤖[^\n]*\n?/, '')), el('p', null, link(c.html_url, 'فتح في GitHub'), '  ', link(briefIssue.html_url, 'كل التقارير')));
         return;
       }
     }
     const names = dir.map((f) => f.name).filter((n) => /^\d{4}-\d{2}-\d{2}\.md$/.test(n)).sort().reverse();
-    if (!names.length) { $('brief-date').textContent = ''; box.replaceChildren(el('div', { class: 'empty', text: 'لا تقارير بعد. أول تقرير يكتبه رئيس العمليات بعد تشغيله في المرحلة 1.' })); return; }
+    if (!names.length) { $('brief-date').textContent = ''; box.replaceChildren(el('div', { class: 'empty', text: 'لا تقارير بعد. يكتب رئيس العمليات تقريره الساعة 07:40 و19:40.' })); return; }
     const text = await rawFile('ops/briefs/' + names[0]);
     $('brief-date').textContent = names[0].slice(0, 10);
     box.replaceChildren(...mdToNodes(text || ''));
   }
   function inline(text) {
-    const out = [];
-    const re = /\[([^\]]+)\]\((https:\/\/[^\s)]+)\)|`([^`]+)`|\*\*([^*]+)\*\*/g;
-    let last = 0, m;
+    const out = []; const re = /\[([^\]]+)\]\((https:\/\/[^\s)]+)\)|`([^`]+)`|\*\*([^*]+)\*\*/g; let last = 0, m;
     while ((m = re.exec(text))) {
       if (m.index > last) out.push(text.slice(last, m.index));
-      if (m[1]) out.push(link(m[2], m[1]));
-      else if (m[3]) out.push(el('code', { text: m[3] }));
-      else if (m[4]) out.push(el('strong', { text: m[4] }));
+      if (m[1]) out.push(link(m[2], m[1])); else if (m[3]) out.push(el('code', { text: m[3] })); else if (m[4]) out.push(el('strong', { text: m[4] }));
       last = re.lastIndex;
     }
     if (last < text.length) out.push(text.slice(last));
     return out;
   }
   function mdToNodes(md) {
-    const nodes = [];
-    let list = null;
+    const nodes = []; let list = null;
     for (const line of md.split(/\r?\n/)) {
+      if (/^\s*(---|_Generated by)/.test(line)) continue;
       const li = line.match(/^\s*(?:[-*]|\d+\.)\s+(.*)$/);
       if (li) { if (!list) { list = el('ul'); nodes.push(list); } list.append(el('li', null, inline(li[1]))); continue; }
-      list = null;
-      if (!line.trim()) continue;
+      list = null; if (!line.trim()) continue;
       const h = line.match(/^(#{1,4})\s+(.*)$/);
       if (h) { nodes.push(el(h[1].length <= 2 ? 'h3' : 'h4', null, inline(h[2]))); continue; }
       nodes.push(el('p', null, inline(line)));
@@ -674,108 +737,98 @@
 
   // ---------- actions ----------
   async function sendCommand() {
-    const text = $('cmd-text').value.trim();
-    if (!text) { $('cmd-text').focus(); return; }
-    const agent = $('cmd-agent').value;
-    const priority = $('cmd-priority').value;
+    const text = $('cmd-text').value.trim(); if (!text) { $('cmd-text').focus(); return; }
+    const agent = $('cmd-agent').value, priority = $('cmd-priority').value;
     const first = text.split(/\r?\n/)[0].trim();
     const title = '[أمر] ' + (first.length > 70 ? first.slice(0, 70) + '…' : first);
-    const body = [
-      '### المطلوب', '', text, '',
-      '### الأولوية', '', priority, '',
-      '### الوكيل المقترح', '', agent ? nameOf(agent) + ' (`' + agent + '`)' : 'رئيس العمليات يقرر', '',
-      MARK
-    ].join('\n');
-    const labels = ['command'];
-    if (agent && agentLabels.has('agent:' + agent)) labels.push('agent:' + agent);
-    const btn = $('cmd-send');
-    btn.disabled = true;
+    const body = ['### المطلوب', '', text, '', '### الأولوية', '', priority, '', '### الوكيل المقترح', '', agent ? nameOf(agent) + ' (`' + agent + '`)' : 'رئيس العمليات يختار', '', MARK].join('\n');
+    const labels = ['command']; if (agent && agentLabels.has('agent:' + agent)) labels.push('agent:' + agent);
+    const btn = $('cmd-send'); btn.disabled = true;
     try {
       const issue = await gh(rp() + '/issues', { method: 'POST', body: { title, body, labels } });
-      $('cmd-text').value = '';
-      toast('أُرسل الأمر #' + issue.number + '.', issue.html_url);
+      $('cmd-text').value = ''; autosize();
+      toast('أُرسل الأمر ' + iso(issue.number) + '. يلتقطه رئيس العمليات في دورته التالية، أو فوراً إن ضغطت Run now على مهمته.', issue.html_url);
       loadAll();
-    } catch (e) {
-      toast('لم يُرسل الأمر: ' + e.message);
-    } finally { btn.disabled = false; }
+    } catch (e) { toast('لم يُرسل الأمر: ' + e.message); } finally { btn.disabled = false; }
   }
   async function approvePR(p) {
-    const ok = await modal({
-      title: 'موافقة ودمج PR #' + p.number,
-      body: p.title + '\n\nسيُدمج في ' + p.base.ref + ' باسمك (squash). لا يمكن التراجع إلا بـ PR جديد.',
-      okText: 'دمج', okClass: 'good'
-    });
+    const ok = await modal({ title: 'موافقة ودمج PR ' + iso(p.number), body: p.title + '\n\nسيُدمج في ' + p.base.ref + ' باسمك. التراجع يكون بـ PR جديد.', okText: 'دمج', okClass: 'go' });
     if (!ok) return;
-    try {
-      await gh(rp() + '/pulls/' + p.number + '/merge', { method: 'PUT', body: { merge_method: 'squash', commit_title: p.title + ' (#' + p.number + ')', sha: p.head.sha } });
-      toast('دُمج PR #' + p.number + '.', p.html_url);
-      loadAll();
-    } catch (e) { toast('لم يُدمج: ' + e.message, p.html_url); }
+    try { await gh(rp() + '/pulls/' + p.number + '/merge', { method: 'PUT', body: { merge_method: 'squash', commit_title: p.title + ' (#' + p.number + ')', sha: p.head.sha } }); toast('دُمج PR ' + iso(p.number) + '.', p.html_url); loadAll(); }
+    catch (e) { toast('لم يُدمج: ' + e.message, p.html_url); }
   }
-  async function approveIssue(i) {
-    const note = await modal({ title: 'موافقة على #' + i.number, body: i.title, input: 'ملاحظة مع الموافقة (اكتب «موافق» إن لم يكن لديك شيء)', okText: 'موافق', okClass: 'good' });
-    if (!note) return;
-    try {
-      await gh(rp() + '/issues/' + i.number + '/comments', { method: 'POST', body: { body: '✅ **موافقة المؤسس**\n\n' + note + '\n\n' + MARK } });
-      await gh(rp() + '/issues/' + i.number + '/labels', { method: 'POST', body: { labels: ['founder-approved'] } });
-      await gh(rp() + '/issues/' + i.number + '/labels/' + encodeURIComponent('needs-founder-approval'), { method: 'DELETE' }).catch(() => null);
-      toast('سُجّلت موافقتك على #' + i.number + '.', i.html_url);
-      loadAll();
-    } catch (e) { toast('لم تُسجَّل الموافقة: ' + e.message, i.html_url); }
-  }
-  async function rejectIssue(i) {
-    const reason = await modal({ title: 'رفض #' + i.number, body: i.title, input: 'سبب الرفض، أو ما تريده بدلاً منه', okText: 'رفض', okClass: 'bad' });
-    if (!reason) return;
-    try {
-      await gh(rp() + '/issues/' + i.number + '/comments', { method: 'POST', body: { body: '⛔ **رفض المؤسس**\n\n' + reason + '\n\n' + MARK } });
-      await gh(rp() + '/issues/' + i.number + '/labels', { method: 'POST', body: { labels: ['founder-rejected'] } });
-      await gh(rp() + '/issues/' + i.number + '/labels/' + encodeURIComponent('needs-founder-approval'), { method: 'DELETE' }).catch(() => null);
-      toast('سُجّل الرفض على #' + i.number + '.', i.html_url);
-      loadAll();
-    } catch (e) { toast('لم يُسجَّل الرفض: ' + e.message, i.html_url); }
-  }
-  async function requestChanges(n, kind) {
-    const text = await modal({ title: (kind === 'PR' ? 'طلب تعديل على PR #' : 'تعليق على #') + n, input: 'ما الذي تريد تغييره؟', okText: 'إرسال' });
+  async function decide(i, approve) {
+    const text = await modal(approve
+      ? { title: 'موافقة على ' + iso(i.number), body: i.title, input: 'ملاحظة مع الموافقة (أو «موافق»)', okText: 'موافق', okClass: 'go' }
+      : { title: 'رفض ' + iso(i.number), body: i.title, input: 'سبب الرفض، أو ما تريده بدلاً منه', okText: 'رفض', okClass: 'stop' });
     if (!text) return;
     try {
-      const c = await gh(rp() + '/issues/' + n + '/comments', { method: 'POST', body: { body: (kind === 'PR' ? '🔁 **طلب تعديل من المؤسس**\n\n' : '') + text + '\n\n' + MARK } });
-      toast('أُرسل تعليقك على #' + n + '.', c.html_url);
-    } catch (e) { toast('لم يُرسل: ' + e.message); }
+      await gh(rp() + '/issues/' + i.number + '/comments', { method: 'POST', body: { body: (approve ? '✅ **موافقة المؤسس**' : '⛔ **رفض المؤسس**') + '\n\n' + text + '\n\n' + MARK } });
+      await gh(rp() + '/issues/' + i.number + '/labels', { method: 'POST', body: { labels: [approve ? 'founder-approved' : 'founder-rejected'] } });
+      await gh(rp() + '/issues/' + i.number + '/labels/' + encodeURIComponent('needs-founder-approval'), { method: 'DELETE' }).catch(() => null);
+      toast((approve ? 'سُجّلت موافقتك على ' : 'سُجّل الرفض على ') + iso(i.number) + '.', i.html_url); loadAll();
+    } catch (e) { toast('لم يُسجَّل القرار: ' + e.message, i.html_url); }
+  }
+  const approveIssue = (i) => decide(i, true);
+  const rejectIssue = (i) => decide(i, false);
+  async function requestChanges(n, kind) {
+    const text = await modal({ title: (kind === 'PR' ? 'طلب تعديل على PR ' : 'تعليق على ') + iso(n), input: 'ما الذي تريد تغييره؟', okText: 'إرسال' });
+    if (!text) return;
+    try { const c = await gh(rp() + '/issues/' + n + '/comments', { method: 'POST', body: { body: (kind === 'PR' ? '🔁 **طلب تعديل من المؤسس**\n\n' : '') + text + '\n\n' + MARK } }); toast('أُرسل تعليقك على ' + iso(n) + '.', c.html_url); }
+    catch (e) { toast('لم يُرسل: ' + e.message); }
+  }
+
+  // ---------- command bar: text / voice ----------
+  function autosize() { const t = $('cmd-text'); t.style.height = '42px'; t.style.height = Math.min(t.scrollHeight, 140) + 'px'; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec = null;
+  function setMode(voice) {
+    $('mode-text').setAttribute('aria-pressed', String(!voice)); $('mode-voice').setAttribute('aria-pressed', String(voice));
+    $('mic').classList.toggle('hidden', !voice);
+    if (voice && !SR) toast('المتصفح لا يدعم الإدخال الصوتي. جرّب Chrome أو Edge.');
+  }
+  function toggleMic() {
+    if (!SR) return;
+    if (rec) { rec.stop(); return; }
+    rec = new SR(); rec.lang = 'ar-SA'; rec.interimResults = true; rec.continuous = false;
+    const base = $('cmd-text').value ? $('cmd-text').value + ' ' : '';
+    rec.onresult = (e) => { let t = ''; for (const r of e.results) t += r[0].transcript; $('cmd-text').value = base + t; autosize(); };
+    rec.onerror = (e) => { toast(e.error === 'not-allowed' ? 'اسمح للمتصفح باستخدام الميكروفون ثم أعد المحاولة.' : 'توقف التسجيل: ' + e.error); };
+    rec.onend = () => { rec = null; $('mic').classList.remove('on'); $('mic').setAttribute('aria-label', 'ابدأ التسجيل'); };
+    rec.start(); $('mic').classList.add('on'); $('mic').setAttribute('aria-label', 'أوقف التسجيل');
+  }
+
+  // ---------- clocks ----------
+  function tick() {
+    const f = (tz) => { try { return new Intl.DateTimeFormat('ar', { timeZone: tz, hour: '2-digit', minute: '2-digit' }).format(new Date()); } catch (e) { return '--:--'; } };
+    $('clock-ams').textContent = f('Europe/Amsterdam'); $('clock-dam').textContent = f('Asia/Damascus');
   }
 
   // ---------- setup / session ----------
   function showSetup(err) {
-    $('app').classList.add('hidden');
-    $('setup').classList.remove('hidden');
-    const box = $('setup-error');
-    box.classList.toggle('hidden', !err);
-    box.textContent = err || '';
-    $('token-input').value = '';
+    $('app').classList.add('hidden'); $('setup').classList.remove('hidden');
+    const box = $('setup-error'); box.classList.toggle('hidden', !err); box.textContent = err || ''; $('token-input').value = '';
   }
   async function connect(t, r, remember, fromSaved) {
     token = t; repo = r;
     try {
-      const [user, info, labels] = await Promise.all([
-        gh('/user'),
-        gh(rp()),
-        gh(rp() + '/labels?per_page=100')
-      ]);
+      const [user, info, labels] = await Promise.all([gh('/user'), gh(rp()), gh(rp() + '/labels?per_page=100')]);
       agentLabels = new Set(labels.map((l) => l.name).filter((n) => n.startsWith('agent:')));
       if (!fromSaved) save(t, r, remember);
-      $('setup').classList.add('hidden');
-      $('app').classList.remove('hidden');
-      $('repo-name').textContent = info.full_name + (info.private ? ' · خاص' : ' · عام!');
+      $('setup').classList.add('hidden'); $('app').classList.remove('hidden');
+      $('repo-name').textContent = info.full_name + (info.private ? '' : '  (عام!)');
       $('login').textContent = user.login;
       if (user.avatar_url && /^https:\/\/avatars\.githubusercontent\.com\//.test(user.avatar_url)) { $('avatar').src = user.avatar_url; $('avatar').classList.remove('hidden'); }
       await loadAll();
-    } catch (e) {
-      token = '';
-      showSetup('تعذّر الاتصال: ' + e.message);
-    }
+    } catch (e) { token = ''; showSetup('تعذّر الاتصال: ' + e.message); }
   }
+
   function init() {
-    document.addEventListener('keydown', onKeyEsc);
     $('avatar').addEventListener('error', () => $('avatar').classList.add('hidden'));
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      if ($('modal-back').style.display === 'flex') $('modal-cancel').click(); else if ($('drawer').classList.contains('open')) closeDrawer();
+    });
     $('connect-btn').addEventListener('click', () => {
       const t = $('token-input').value.trim();
       const r = $('repo-input').value.trim().replace(/^https:\/\/github\.com\//, '').replace(/\/$/, '');
@@ -784,21 +837,21 @@
       connect(t, r, $('remember').checked, false);
     });
     $('token-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('connect-btn').click(); });
-    $('logout-btn').addEventListener('click', async () => {
-      const ok = await modal({ title: 'خروج', body: 'سيُحذف الرمز من هذا المتصفح. ستحتاج لصقه من جديد.', okText: 'خروج', okClass: 'bad' });
-      if (!ok) return;
-      forget(); token = ''; showSetup('');
-    });
+    $('logout-btn').addEventListener('click', async () => { const ok = await modal({ title: 'خروج', body: 'سيُحذف الرمز من هذا المتصفح، وستحتاج لصقه من جديد.', okText: 'خروج', okClass: 'stop' }); if (ok) { forget(); token = ''; showSetup(''); } });
     $('refresh-btn').addEventListener('click', loadAll);
     $('cmd-send').addEventListener('click', sendCommand);
+    $('cmd-text').addEventListener('input', autosize);
     $('cmd-text').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) sendCommand(); });
-    $('log-agent').addEventListener('change', renderLog);
+    $('mode-text').addEventListener('click', () => setMode(false));
+    $('mode-voice').addEventListener('click', () => setMode(true));
+    $('mic').addEventListener('click', toggleMic);
+    $('dr-close').addEventListener('click', closeDrawer);
+    $('scrim').addEventListener('click', closeDrawer);
+    tick(); setInterval(tick, 30000);
     setInterval(() => { if (token && document.visibilityState === 'visible') loadAll(); }, 60000);
     document.addEventListener('visibilitychange', () => { if (token && document.visibilityState === 'visible') loadAll(); });
-
     const saved = readSaved();
-    if (saved && saved.r) connect(saved.t, saved.r, true, true);
-    else showSetup('');
+    if (saved && saved.r) connect(saved.t, saved.r, true, true); else showSetup('');
   }
   init();
 })();

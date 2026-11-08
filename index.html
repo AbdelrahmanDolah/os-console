@@ -187,7 +187,7 @@
     </section>
 
     <section class="card span2" aria-labelledby="brief-title">
-      <h2 id="brief-title">آخر تقرير صباحي <span id="brief-date" class="pill muted"></span></h2>
+      <h2 id="brief-title">آخر تقرير <span id="brief-date" class="pill muted"></span></h2>
       <div id="brief" class="brief"></div>
     </section>
   </div>
@@ -397,16 +397,17 @@
     refreshing = true;
     $('refresh-btn').disabled = true;
     try {
-      const [registryText, logText, openIssues, pulls, commands, briefsDir] = await Promise.all([
+      const [registryText, logText, openIssues, pulls, commands, briefsDir, recentComments] = await Promise.all([
         rawFile('agents/registry.yaml'),
         rawFile('ops/activity-log.jsonl'),
         gh(rp() + '/issues?state=open&per_page=100'),
         gh(rp() + '/pulls?state=open&per_page=50'),
         gh(rp() + '/issues?state=all&labels=command&per_page=12&sort=created&direction=desc'),
-        gh(rp() + '/contents/ops/briefs').catch((e) => (e.status === 404 ? [] : Promise.reject(e)))
+        gh(rp() + '/contents/ops/briefs').catch((e) => (e.status === 404 ? [] : Promise.reject(e))),
+        gh(rp() + '/issues/comments?sort=created&direction=desc&per_page=60').catch(() => [])
       ]);
       state.agents = registryText ? parseRegistry(registryText) : [];
-      state.log = parseLog(logText || '');
+      state.log = mergeLog(parseLog(logText || ''), agentComments(recentComments));
       const issuesOnly = openIssues.filter((i) => !i.pull_request);
       renderAgents(issuesOnly);
       renderAgentSelects();
@@ -414,7 +415,8 @@
       renderCommands(commands.filter((i) => !i.pull_request));
       renderHuman(issuesOnly.filter((i) => hasLabel(i, 'human-task')));
       await renderPending(pulls, issuesOnly.filter((i) => hasLabel(i, 'needs-founder-approval')));
-      await renderBrief(Array.isArray(briefsDir) ? briefsDir : []);
+      const briefIssue = openIssues.find((i) => !i.pull_request && hasLabel(i, 'brief'));
+      await renderBrief(Array.isArray(briefsDir) ? briefsDir : [], briefIssue);
       $('refreshed').textContent = 'آخر تحديث ' + new Date().toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit' });
       $('load-error').classList.add('hidden');
     } catch (e) {
@@ -433,6 +435,22 @@
       try { const j = JSON.parse(line); if (j && typeof j === 'object') out.push(j); } catch (e) { out.push({ ts: '', agent: '?', action: line, invalid: true }); }
     }
     return out.reverse();
+  }
+
+  // Agent comments start with "🤖 <agent-id> · <one line>": they are the live activity log.
+  function agentComments(list) {
+    const out = [];
+    for (const c of Array.isArray(list) ? list : []) {
+      const first = String(c.body || '').split(/\r?\n/)[0];
+      const m = first.match(/^\s*🤖\s*([a-z0-9-]+)\s*[·:\-]\s*(.*)$/);
+      if (!m) continue;
+      const num = (String(c.issue_url || '').match(/\/(\d+)$/) || [])[1];
+      out.push({ ts: c.created_at, agent: m[1], action: m[2], ref: num ? '#' + num : '', url: c.html_url, live: true });
+    }
+    return out;
+  }
+  function mergeLog(fileLog, live) {
+    return [...live, ...fileLog].sort((a, b) => (Date.parse(b.ts) || 0) - (Date.parse(a.ts) || 0));
   }
 
   // ---------- render: agents ----------
@@ -505,7 +523,7 @@
       el('div', { class: 'meta' },
         el('span', { class: 'pill ' + (e.invalid ? 'fail' : 'muted'), text: e.invalid ? 'سطر غير صالح' : nameOf(e.agent || '?') }),
         el('span', { text: e.ts ? ago(e.ts) : '' }),
-        e.ref ? el('span', { class: 'ltr', text: String(e.ref) }) : null
+        e.url ? link(e.url, String(e.ref || 'فتح')) : (e.ref ? el('span', { class: 'ltr', text: String(e.ref) }) : null)
       ),
       el('div', { class: 'what', text: String(e.action || '') }),
       e.reason ? el('div', { class: 'meta what', text: 'السبب: ' + e.reason }) : null
@@ -607,8 +625,18 @@
   }
 
   // ---------- render: latest brief (tiny, safe markdown) ----------
-  async function renderBrief(dir) {
+  async function renderBrief(dir, briefIssue) {
     const box = $('brief');
+    if (briefIssue && briefIssue.comments > 0) {
+      const last = Math.max(1, Math.ceil(briefIssue.comments / 100));
+      const page = await gh(rp() + '/issues/' + briefIssue.number + '/comments?per_page=100&page=' + last).catch(() => []);
+      const c = Array.isArray(page) && page.length ? page[page.length - 1] : null;
+      if (c) {
+        $('brief-date').textContent = new Date(c.created_at).toLocaleString('ar', { dateStyle: 'medium', timeStyle: 'short' });
+        box.replaceChildren(...mdToNodes(String(c.body || '')), el('p', null, link(c.html_url, 'فتح في GitHub'), ' · ', link(briefIssue.html_url, 'كل التقارير')));
+        return;
+      }
+    }
     const names = dir.map((f) => f.name).filter((n) => /^\d{4}-\d{2}-\d{2}\.md$/.test(n)).sort().reverse();
     if (!names.length) { $('brief-date').textContent = ''; box.replaceChildren(el('div', { class: 'empty', text: 'لا تقارير بعد. أول تقرير يكتبه رئيس العمليات بعد تشغيله في المرحلة 1.' })); return; }
     const text = await rawFile('ops/briefs/' + names[0]);

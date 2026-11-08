@@ -69,23 +69,12 @@
   .stat.brass .n { color: var(--brass); }
   @media (max-width: 900px) { .rail { grid-template-columns: repeat(3, 1fr); } .stat:nth-child(4) { border-inline-start: 0; } .stat:nth-child(n+4) { border-top: 1px solid var(--line); } }
 
-  /* Pipeline: the order of work, a real sequence */
-  .pipeline { display: flex; align-items: stretch; margin-top: 14px; gap: 0; }
-  .stage { flex: 1; position: relative; padding: 10px 16px 10px 26px; background: var(--panel-2); border: 1px solid var(--line); border-inline-start: 0; }
-  .stage:first-child { border-inline-start: 1px solid var(--line); border-start-start-radius: 10px; border-end-start-radius: 10px; }
-  .stage:last-child { border-start-end-radius: 10px; border-end-end-radius: 10px; }
-  .stage .n { font-family: var(--display); font-size: 22px; font-weight: 700; }
-  .stage .l { color: var(--stone); font-size: 13px; }
-  .stage:not(:last-child)::after { content: ""; position: absolute; inset-inline-end: -9px; top: 50%; width: 16px; height: 16px; background: var(--panel-2); border-top: 1px solid var(--line); border-inline-end: 1px solid var(--line); transform: translateY(-50%) rotate(45deg); z-index: 1; }
-  [dir="rtl"] .stage:not(:last-child)::after { transform: translateY(-50%) rotate(-135deg); }
-  .stage.hot .n { color: var(--brass); }
-  @media (max-width: 700px) { .pipeline { flex-wrap: wrap; } .stage { flex: 1 1 30%; border: 1px solid var(--line); border-radius: 8px !important; margin: 3px; padding: 8px 12px; } .stage::after { display: none; } }
-
   /* Main grid */
   .grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 18px; align-items: start; }
-  .grid2 { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 16px; align-items: start; }
-  @media (max-width: 1100px) { .grid, .grid2 { grid-template-columns: 1fr 1fr; } .map-panel, .brief-panel { grid-column: 1 / -1; } }
-  @media (max-width: 700px) { .grid, .grid2 { grid-template-columns: 1fr; } }
+  .grid2 { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 16px; margin-top: 16px; align-items: start; }
+  .grid2.two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  @media (max-width: 1100px) { .grid { grid-template-columns: 1fr 1fr; } .map-panel { grid-column: 1 / -1; } }
+  @media (max-width: 800px) { .grid, .grid2, .grid2.two { grid-template-columns: 1fr; } }
   .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; min-width: 0; }
   .panel h2 { font-family: var(--display); font-weight: 500; font-size: 19px; margin: 0 0 12px; display: flex; align-items: center; gap: 10px; }
   .count { font-family: var(--ui); font-size: 13px; font-weight: 600; color: var(--stone); border: 1px solid var(--line); border-radius: 999px; padding: 0 9px; }
@@ -161,7 +150,7 @@
 
   /* Agent drawer */
   .scrim { position: fixed; inset: 0; background: rgba(5,8,16,.6); z-index: 25; display: none; }
-  .drawer { position: fixed; top: 0; bottom: 0; inset-inline-end: 0; width: min(440px, 100%); background: var(--panel); border-inline-start: 1px solid var(--line); z-index: 26; transform: translateX(-100%); transition: transform .22s ease-out; overflow: auto; padding: 20px; }
+  .drawer { position: fixed; top: 0; bottom: 0; inset-inline-end: 0; width: min(480px, 100%); background: var(--panel); border-inline-start: 1px solid var(--line); z-index: 26; transform: translateX(-100%); transition: transform .22s ease-out; overflow: auto; padding: 20px; }
   [dir="rtl"] .drawer { inset-inline-end: auto; inset-inline-start: auto; left: 0; border-inline-start: 0; border-inline-end: 1px solid var(--line); }
   .drawer.open { transform: translateX(0); }
   @media (prefers-reduced-motion: reduce) { .drawer { transition: none; } }
@@ -186,6 +175,86 @@
   .modal textarea { width: 100%; min-height: 84px; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--panel-2); margin-top: 8px; }
   .modal .actions { margin-top: 14px; }
   footer { color: var(--stone); font-size: 12.5px; text-align: center; padding: 22px 0 6px; }
+
+  /* Live system map: the core of the page */
+  .hero { margin-top: 14px; border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px 8px;
+    background: radial-gradient(ellipse 60% 70% at 72% 50%, rgba(214,166,75,.08), transparent 70%), radial-gradient(ellipse 40% 60% at 40% 50%, rgba(143,191,90,.05), transparent 70%), var(--panel); }
+  .hero-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .hero-head h2 { font-family: var(--display); font-weight: 500; font-size: 19px; margin: 0; }
+  .story { color: var(--jasmine); font-size: 15px; margin: 6px 0 0; max-width: 90ch; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-inline-start: auto; }
+  .chip { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; font-size: 12.5px; color: var(--stone); white-space: nowrap; }
+  .chip b { color: var(--jasmine); font-weight: 600; }
+  #map { width: 100%; height: auto; display: block; margin-top: 6px; direction: ltr; }
+  #map.tall { max-width: 460px; margin-inline: auto; }
+  #map text { fill: var(--jasmine); font-family: var(--ui); }
+  #map .muted { fill: var(--stone); }
+  #map .big { font-family: var(--display); font-weight: 700; }
+  #map .edge { fill: none; stroke: var(--line); stroke-width: 1.5; }
+  #map .edge.live { stroke: #3A4A6E; }
+  #map .edge.draw { stroke-dasharray: 900; stroke-dashoffset: 900; animation: draw 1.4s ease-out forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  #map .box { fill: var(--panel-2); stroke: var(--line); }
+  #map .box.hot { stroke: var(--brass); }
+  #map .p-cmd { fill: var(--jasmine); }
+  #map .p-work { fill: var(--olive); }
+  #map .p-wait { fill: var(--brass); }
+  #map .p-done { fill: var(--stone); }
+  #map .star { fill: rgba(214,166,75,.10); stroke: var(--brass); stroke-width: 1.5; }
+  #map .star-in { fill: none; stroke: var(--brass); stroke-opacity: .5; }
+  #map .spin { transform-box: fill-box; transform-origin: center; animation: spin 90s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #map .adot { fill: var(--line); stroke: var(--stone); stroke-width: 1; }
+  #map .adot.active { fill: rgba(143,191,90,.25); stroke: var(--olive); }
+  #map .adot.reading { fill: rgba(214,166,75,.25); stroke: var(--brass); }
+  #map .adot.working { fill: var(--olive); stroke: var(--olive); }
+  #map .ring { fill: none; stroke: var(--olive); stroke-width: 1.5; }
+  #map .hit { fill: transparent; cursor: pointer; }
+  #map .hit:focus-visible { outline: none; stroke: var(--brass); stroke-width: 2; }
+  @media (prefers-reduced-motion: reduce) { #map .spin, #map .edge.draw { animation: none; stroke-dashoffset: 0; } }
+
+  /* Commands with progress */
+  .bar { height: 6px; border-radius: 3px; background: var(--panel-2); overflow: hidden; margin-top: 8px; }
+  .bar > i { display: block; height: 100%; background: var(--olive); border-radius: 3px; }
+  .steps { list-style: none; margin: 8px 0 0; padding: 0; font-size: 13px; }
+  .steps li { display: flex; gap: 8px; align-items: baseline; padding: 2px 0; color: var(--stone); }
+  .steps li a { color: var(--jasmine); }
+  .steps li.done a { color: var(--stone); text-decoration: line-through; text-decoration-color: rgba(168,159,144,.5); }
+
+  /* Performance */
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .tile { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--panel-2); }
+  .tile .n { font-family: var(--display); font-size: 24px; font-weight: 700; line-height: 1.2; }
+  .tile .l { color: var(--stone); font-size: 12.5px; }
+  .viz-title { font-size: 13.5px; font-weight: 600; margin: 16px 0 4px; }
+  .viz-sub { color: var(--stone); font-size: 12.5px; margin: 0 0 6px; }
+  .viz svg { display: block; width: 100%; direction: ltr; overflow: visible; }
+  .viz text { fill: var(--stone); font-family: var(--ui); font-size: 11.5px; }
+  .viz text.val { fill: var(--jasmine); font-weight: 600; }
+  .viz text.name { fill: var(--jasmine); font-size: 12.5px; }
+  .viz .grid { stroke: var(--line); stroke-width: 1; }
+  .viz .mark { fill: var(--olive); }
+  .viz .hitbar { fill: transparent; cursor: default; }
+  .viz .hitbar:hover + .mark, .viz .hitbar:focus + .mark { fill: #A9D47A; }
+  .viz .hitbar:focus { outline: none; }
+  details.table { margin-top: 10px; font-size: 13px; color: var(--stone); }
+  details.table summary { cursor: pointer; }
+  details.table table { border-collapse: collapse; margin-top: 6px; width: 100%; }
+  details.table td, details.table th { border-top: 1px solid var(--line); padding: 3px 6px; text-align: start; font-weight: 400; }
+  .tip { position: fixed; z-index: 45; pointer-events: none; background: var(--jasmine); color: var(--night); border-radius: 8px; padding: 6px 10px; font-size: 13px; display: none; box-shadow: 0 6px 20px rgba(0,0,0,.35); }
+  .tip b { display: block; font-size: 15px; }
+
+  /* Chat in the agent drawer */
+  .thread { display: flex; flex-direction: column; gap: 8px; max-height: 340px; overflow: auto; padding: 4px 2px; }
+  .msg { max-width: 88%; border-radius: 12px; padding: 8px 11px; font-size: 14px; border: 1px solid var(--line); }
+  .msg.msg-me { align-self: flex-start; background: var(--panel-2); border-end-start-radius: 4px; }
+  .msg.msg-agent { align-self: flex-end; background: rgba(143,191,90,.07); border-color: rgba(143,191,90,.35); border-end-end-radius: 4px; }
+  .msg.msg-other { align-self: center; color: var(--stone); font-size: 12.5px; }
+  .msg .meta { margin: 0 0 2px; }
+  .msg code { overflow-wrap: anywhere; }
+  .msg p { margin: 2px 0; } .msg ul { margin: 2px 0; padding-inline-start: 18px; } .msg h3, .msg h4 { font-size: 14px; margin: 6px 0 2px; }
+  .chat-status { color: var(--stone); font-size: 12.5px; margin: 6px 0; }
+  .composer textarea { width: 100%; min-height: 64px; resize: vertical; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--panel-2); }
 </style>
 </head>
 <body>
@@ -242,13 +311,17 @@
       <div class="stat"><div class="n" id="k-merged">0</div><div class="l">دُمج في 7 أيام</div></div>
     </section>
 
-    <nav class="pipeline" aria-label="مسار العمل">
-      <div class="stage"><div class="n" id="p-commands">0</div><div class="l">أوامرك المفتوحة</div></div>
-      <div class="stage"><div class="n" id="p-ready">0</div><div class="l">جاهزة</div></div>
-      <div class="stage"><div class="n" id="p-progress">0</div><div class="l">قيد العمل</div></div>
-      <div class="stage" id="p-review-box"><div class="n" id="p-review">0</div><div class="l">تنتظر دمجك</div></div>
-      <div class="stage"><div class="n" id="p-merged">0</div><div class="l">دُمجت هذا الأسبوع</div></div>
-    </nav>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-head">
+        <h2 id="hero-title">المنظومة الآن</h2>
+        <div class="chips">
+          <span class="chip">المنفّذ يعمل <b id="next-exec">—</b></span>
+          <span class="chip">رئيس العمليات <b id="next-hoo">—</b></span>
+        </div>
+      </div>
+      <p id="story" class="story"></p>
+      <svg id="map" role="group" aria-label="خريطة حيّة: أوامرك تمر برئيس العمليات إلى الأقسام، ثم إلى الدمج"></svg>
+    </section>
 
     <div class="grid">
       <section class="panel map-panel" aria-labelledby="map-title">
@@ -273,14 +346,21 @@
       </section>
     </div>
 
+    <div class="grid2 two">
+      <section class="panel" aria-labelledby="commands-title">
+        <h2 id="commands-title">أوامرك وتقدّمها</h2>
+        <div id="commands"></div>
+      </section>
+      <section class="panel" aria-labelledby="perf-title">
+        <h2 id="perf-title">الأداء <span class="count">آخر 14 يوماً</span></h2>
+        <div id="perf"></div>
+      </section>
+    </div>
+
     <div class="grid2">
       <section class="panel brief-panel" aria-labelledby="brief-title">
         <h2 id="brief-title">آخر تقرير <span id="brief-date" class="count"></span></h2>
         <div id="brief" class="brief"></div>
-      </section>
-      <section class="panel" aria-labelledby="commands-title">
-        <h2 id="commands-title">أوامرك</h2>
-        <div id="commands"></div>
       </section>
       <section class="panel" aria-labelledby="human-title">
         <h2 id="human-title">للفريق الميداني <span id="human-count" class="count">0</span></h2>
@@ -314,6 +394,13 @@
     <div id="dr-sub" class="meta"></div>
     <dl id="dr-facts"></dl>
     <div class="actions"><button id="dr-command" class="btn primary">أعطه أمراً</button><a id="dr-file" class="btn small" target="_blank" rel="noopener noreferrer">ملف تعليماته</a></div>
+    <h3>محادثة</h3>
+    <div id="dr-thread" class="thread"></div>
+    <div id="dr-chat-status" class="chat-status"></div>
+    <div class="composer">
+      <textarea id="chat-text" placeholder="اسأله سؤالاً، أو ناقشه في فكرة…" aria-label="رسالة إلى الوكيل"></textarea>
+      <div class="actions"><button id="chat-send" class="btn primary small">إرسال</button><button id="chat-to-cmd" class="btn small">حوّله لأمر</button></div>
+    </div>
     <h3>مهامه المفتوحة</h3>
     <div id="dr-tasks"></div>
     <h3>آخر نشاطه</h3>
@@ -322,6 +409,7 @@
 </div>
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="tip" class="tip" role="presentation"></div>
 
 <div id="modal-back" class="modal-back" role="dialog" aria-modal="true" aria-labelledby="modal-title">
   <div class="modal">
@@ -355,10 +443,17 @@
   };
   const STAGE_AR = { 'designed': 'مصمَّم', 'read-only': 'قراءة فقط', 'write-with-approval': 'نشِط', 'live': 'LIVE' };
 
+  // Schedules of the two scheduled tasks, in Amsterdam minutes since midnight (docs/os/execution-loop.md).
+  const SCHEDULES = { exec: [550, 670, 790, 910, 1030, 1150, 1270, 1390], hoo: [460, 1180] };
+  const MAP_DEPTS = ['market-regulatory', 'customers-growth', 'product-engineering', 'operations-support', 'sourcing-partners', 'finance'];
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const reduceMotion = (() => { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
+
   let token = '', repo = '';
   let agentLabels = new Set();
   let refreshing = false;
-  const state = { agents: [], log: [], openIssues: [], working: {}, openBy: {} };
+  let lastCounts = null;
+  const state = { agents: [], log: [], openIssues: [], recent: [], closedPulls: [], pulls: [], working: {}, openBy: {}, chats: {}, steps: {}, mapSig: '', mapDrawn: false, drawerId: null };
   const $ = (id) => document.getElementById(id);
 
   // ---------- storage ----------
@@ -425,6 +520,36 @@
     for (const k of kids.flat()) if (k !== null && k !== undefined && k !== false) n.append(k.nodeType ? k : document.createTextNode(String(k)));
     return n;
   }
+  function svg(tag, attrs, ...kids) {
+    const n = document.createElementNS(SVGNS, tag);
+    if (attrs) for (const [k, v] of Object.entries(attrs)) {
+      if (v === null || v === undefined || v === false) continue;
+      if (k === 'text') n.textContent = v;
+      else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+      else n.setAttribute(k, String(v));
+    }
+    // The map is laid out left to right; Arabic labels are isolated as right-to-left runs so mixed numbers read correctly.
+    for (const k of kids.flat()) if (k) n.append(k.nodeType ? k : document.createTextNode(tag === 'text' && /[\u0600-\u06FF]/.test(String(k)) ? '\u2067' + k + '\u2069' : String(k)));
+    return n;
+  }
+  function amsNow() {
+    try {
+      const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Amsterdam', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date());
+      const get = (t) => Number((parts.find((x) => x.type === t) || {}).value || 0);
+      return get('hour') * 60 + get('minute');
+    } catch (e) { return new Date().getHours() * 60 + new Date().getMinutes(); }
+  }
+  function nextRun(slots) {
+    const now = amsNow();
+    let next = slots.find((x) => x > now), tomorrow = false;
+    if (next === undefined) { next = slots[0]; tomorrow = true; }
+    const diff = (tomorrow ? next + 1440 : next) - now;
+    const hhmm = String(Math.floor(next / 60)).padStart(2, '0') + ':' + String(next % 60).padStart(2, '0');
+    if (diff < 60) return 'بعد ' + diff + ' دقيقة';
+    return (tomorrow ? 'غداً ' : '') + hhmm;
+  }
+  const cleanTitle = (t) => String(t || '').replace(/^\[(مهمة|أمر)\]\s*/, '').replace(/^\(\d+\/\d+\)\s*/, '');
+  function parentOf(body) { const m = String(body || '').match(/<!--\s*os:parent=(\d+)\s*-->/); return m ? Number(m[1]) : null; }
   function link(href, text) { return el('a', { href: /^https:\/\//.test(href) ? href : '#', target: '_blank', rel: 'noopener noreferrer', text }); }
   const iso = (n) => '⁨#' + n + '⁩';
   const rtf = (() => { try { return new Intl.RelativeTimeFormat('ar', { numeric: 'auto' }); } catch (e) { return null; } })();
@@ -504,7 +629,7 @@
     if (refreshing) return;
     refreshing = true; $('refresh-btn').disabled = true;
     try {
-      const [registryText, logText, openIssues, pulls, commands, briefsDir, recentComments, closedPulls] = await Promise.all([
+      const [registryText, logText, openIssues, pulls, commands, briefsDir, recentComments, closedPulls, recentAll] = await Promise.all([
         rawFile('agents/registry.yaml'),
         rawFile('ops/activity-log.jsonl'),
         gh(rp() + '/issues?state=open&per_page=100'),
@@ -512,38 +637,48 @@
         gh(rp() + '/issues?state=all&labels=command&per_page=12&sort=created&direction=desc'),
         gh(rp() + '/contents/ops/briefs').catch((e) => (e.status === 404 ? [] : Promise.reject(e))),
         gh(rp() + '/issues/comments?sort=created&direction=desc&per_page=60').catch(() => []),
-        gh(rp() + '/pulls?state=closed&sort=updated&direction=desc&per_page=50').catch(() => [])
+        gh(rp() + '/pulls?state=closed&sort=updated&direction=desc&per_page=50').catch(() => []),
+        gh(rp() + '/issues?state=all&sort=created&direction=desc&per_page=100').catch(() => [])
       ]);
       state.agents = registryText ? parseRegistry(registryText) : [];
       state.log = [...agentComments(recentComments), ...parseLog(logText || '')].sort(byNewest);
       const issues = openIssues.filter((i) => !i.pull_request);
       state.openIssues = issues;
-      state.working = {}; state.openBy = {};
+      state.pulls = pulls;
+      state.closedPulls = closedPulls;
+      state.recent = recentAll.filter((i) => !i.pull_request);
+      state.working = {}; state.openBy = {}; state.chats = {}; state.steps = {};
       for (const i of issues) for (const n of labelNames(i)) {
         if (!n.startsWith('agent:')) continue;
         const id = n.slice(6);
+        if (hasLabel(i, 'chat')) { if (!state.chats[id] || i.number < state.chats[id].number) state.chats[id] = i; continue; }
+        if (hasLabel(i, 'command')) continue;
         (state.openBy[id] = state.openBy[id] || []).push(i);
         if (hasLabel(i, 'in-progress')) state.working[id] = i;
       }
+      for (const i of state.recent) { const par = parentOf(i.body); if (par) (state.steps[par] = state.steps[par] || []).push(i); }
+      for (const k of Object.keys(state.steps)) state.steps[k].sort((a, b) => a.number - b.number);
       const weekAgo = Date.now() - 7 * 864e5;
       const merged7 = closedPulls.filter((p) => p.merged_at && Date.parse(p.merged_at) >= weekAgo).length;
       const ready = issues.filter((i) => hasLabel(i, 'ready')).length;
-      const inProgress = issues.filter((i) => hasLabel(i, 'in-progress')).length;
+      const inProgress = issues.filter((i) => hasLabel(i, 'in-progress') && !hasLabel(i, 'command')).length;
       const openCommands = issues.filter((i) => hasLabel(i, 'command')).length;
       const approvals = issues.filter((i) => hasLabel(i, 'needs-founder-approval'));
+      const reviews = issues.filter((i) => hasLabel(i, 'command') && hasLabel(i, 'review'));
       const active = state.agents.filter((a) => a.stage === 'write-with-approval' || a.stage === 'live').length;
 
       setNum('k-agents', state.agents.length); setNum('k-active', active); setNum('k-working', Object.keys(state.working).length);
-      setNum('k-ready', ready); setNum('k-pending', pulls.length + approvals.length); setNum('k-merged', merged7);
-      setNum('p-commands', openCommands); setNum('p-ready', ready); setNum('p-progress', inProgress); setNum('p-review', pulls.length); setNum('p-merged', merged7);
-      $('p-review-box').classList.toggle('hot', pulls.length > 0);
+      setNum('k-ready', ready); setNum('k-pending', pulls.length + approvals.length + reviews.length); setNum('k-merged', merged7);
 
       renderMap();
       renderAgentSelect();
       renderFeed();
+      lastCounts = { openCommands, ready, inProgress, merged7, pending: pulls.length + approvals.length + reviews.length, commands: issues.filter((i) => hasLabel(i, 'command')) };
+      renderHero(lastCounts);
       renderCommands(commands.filter((i) => !i.pull_request));
+      renderPerf();
       renderHuman(issues.filter((i) => hasLabel(i, 'human-task')));
-      await renderPending(pulls, approvals);
+      await renderPending(pulls, approvals, reviews);
       await renderBrief(Array.isArray(briefsDir) ? briefsDir : [], issues.find((i) => hasLabel(i, 'brief')));
       $('refreshed').textContent = 'محدَّث ' + new Date().toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit' });
       $('live-dot').className = 'pulse-dot';
@@ -594,6 +729,283 @@
     sel.value = keep;
   }
 
+  // ---------- live system map ----------
+  function deptOf(id) { const a = state.agents.find((x) => x.id === id); return a ? a.department : null; }
+  function agentOfIssue(i) { const n = labelNames(i).find((x) => x.startsWith('agent:')); return n ? n.slice(6) : null; }
+  function renderHero(c) {
+    $('next-exec').textContent = nextRun(SCHEDULES.exec);
+    $('next-hoo').textContent = nextRun(SCHEDULES.hoo);
+    // Story: one honest sentence about what is happening now.
+    const parts = [];
+    const working = Object.entries(state.working);
+    if (working.length === 1) parts.push(nameOf(working[0][0]) + ' يعمل الآن على «' + cleanTitle(working[0][1].title) + '».');
+    else if (working.length > 1) parts.push((working.length === 2 ? 'وكيلان يعملان' : working.length + ' وكلاء يعملون') + ' الآن: ' + working.map(([id]) => nameOf(id)).join('، ') + '.');
+    else if (c.ready) parts.push((c.ready === 1 ? 'مهمة جاهزة' : c.ready === 2 ? 'مهمتان جاهزتان' : c.ready + ' مهام جاهزة') + '، يلتقطها المنفّذ ' + nextRun(SCHEDULES.exec) + '.');
+    else parts.push('لا عمل جارٍ الآن.');
+    const unplanned = c.commands.filter((i) => !(state.steps[i.number] || []).length && !['in-progress', 'review', 'for-chat'].some((l) => hasLabel(i, l)));
+    if (unplanned.length) parts.push((unplanned.length === 1 ? 'أمرك ' + iso(unplanned[0].number) : unplanned.length + ' أوامر') + ' ينتظر خطة رئيس العمليات ' + nextRun(SCHEDULES.hoo) + '.');
+    if (c.pending) parts.push('ينتظر قرارك ' + c.pending + '.');
+    $('story').textContent = parts.join(' ');
+
+    // Flow counts per department.
+    const flow = {};
+    for (const d of MAP_DEPTS) flow[d] = { work: 0, review: 0 };
+    let looseReview = 0;
+    for (const i of state.openIssues) {
+      if (hasLabel(i, 'chat') || hasLabel(i, 'command')) continue;
+      const d = deptOf(agentOfIssue(i));
+      if (!d || !flow[d]) continue;
+      if (['ready', 'in-progress', 'queued'].some((l) => hasLabel(i, l))) flow[d].work++;
+    }
+    for (const p of state.pulls) {
+      const m = String(p.head && p.head.ref || '').match(/^claude\/issue-(\d+)/);
+      const issue = m ? state.openIssues.find((i) => i.number === Number(m[1])) || state.recent.find((i) => i.number === Number(m[1])) : null;
+      const d = issue ? deptOf(agentOfIssue(issue)) : null;
+      if (d && flow[d]) flow[d].review++; else looseReview++;
+    }
+    const svgEl = $('map');
+    const tall = svgEl.parentElement.clientWidth < 900;
+    const sig = JSON.stringify([tall, c.openCommands, c.ready, c.inProgress, c.merged7, state.pulls.length, flow, Object.keys(state.working).sort(), state.agents.map((a) => a.id + a.stage)]);
+    if (sig === state.mapSig) return;
+    state.mapSig = sig;
+    drawMap(svgEl, tall, c, flow, looseReview);
+  }
+
+  function drawMap(svgEl, tall, c, flow, looseReview) {
+    const W = tall ? 400 : 1200, H = tall ? 800 : 400;
+    svgEl.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svgEl.classList.toggle('tall', tall);
+    const draw = !state.mapDrawn && !reduceMotion;
+    const L = tall
+      ? { founder: [200, 44], core: [200, 160], review: [200, 610], main: [200, 718], dw: 178, dh: 58 }
+      : { founder: [1120, 200], core: [930, 200], review: [300, 200], main: [110, 200], dw: 290, dh: 46 };
+    const depts = MAP_DEPTS.map((d, k) => {
+      if (tall) { const col = k % 2, row = Math.floor(k / 2); return { d, cx: col === 0 ? 296 : 104, cy: 290 + row * 82 }; }
+      return { d, cx: 600, cy: 40 + k * 64 };
+    });
+    const g = { edges: svg('g'), parts: svg('g'), nodes: svg('g') };
+    let pid = 0;
+    function edge(dPath, n, kind, dur) {
+      const id = 'e' + (pid++);
+      g.edges.append(svg('path', { id, d: dPath, class: 'edge' + (n ? ' live' : '') + (draw ? ' draw' : '') }));
+      const count = Math.min(n, 6);
+      for (let k = 0; k < count; k++) {
+        const dot = svg('circle', { r: 3.5, class: 'p-' + kind });
+        if (reduceMotion) { dot.dataset.at = String((k + 1) / (count + 1)); dot.dataset.path = id; }
+        else { dot.setAttribute('cx', '-20'); dot.append(svg('animateMotion', { dur: dur + 's', begin: (-k * dur / count).toFixed(2) + 's', repeatCount: 'indefinite', rotate: 'auto' }, svg('mpath', { href: '#' + id }))); }
+        g.parts.append(dot);
+      }
+    }
+    const [fx, fy] = L.founder, [cx0, cy0] = L.core, [rx, ry] = L.review, [mx, my] = L.main;
+    if (tall) {
+      edge(`M${fx} ${fy + 30} L${cx0} ${cy0 - 40}`, c.openCommands, 'cmd', 2.4);
+      for (const t of depts) {
+        edge(`M${cx0} ${cy0 + 40} C${cx0} ${cy0 + 80} ${t.cx} ${t.cy - 70} ${t.cx} ${t.cy - L.dh / 2}`, flow[t.d].work, 'work', 3.2);
+        edge(`M${t.cx} ${t.cy + L.dh / 2} C${t.cx} ${ry - 90} ${rx} ${ry - 80} ${rx} ${ry - 30}`, flow[t.d].review, 'wait', 3.6);
+      }
+      edge(`M${rx} ${ry + 30} L${mx} ${my - 30}`, c.merged7, 'done', 4);
+    } else {
+      edge(`M${fx - 34} ${fy} L${cx0 + 46} ${cy0}`, c.openCommands, 'cmd', 2.4);
+      for (const t of depts) {
+        edge(`M${cx0 - 46} ${cy0} C${cx0 - 130} ${cy0} ${t.cx + L.dw / 2 + 70} ${t.cy} ${t.cx + L.dw / 2} ${t.cy}`, flow[t.d].work, 'work', 3.2);
+        edge(`M${t.cx - L.dw / 2} ${t.cy} C${t.cx - L.dw / 2 - 70} ${t.cy} ${rx + 110} ${ry} ${rx + 40} ${ry}`, flow[t.d].review, 'wait', 3.6);
+      }
+      edge(`M${rx - 40} ${ry} L${mx + 36} ${my}`, c.merged7, 'done', 4.5);
+    }
+    // PRs without a task (setup work) run straight from the core to review, through the gap between department boxes.
+    if (looseReview) edge(tall ? `M${cx0} ${cy0 + 46} L${rx} ${ry - 30}` : `M${cx0 - 46} ${cy0} L${rx + 30} ${ry}`, looseReview, 'wait', 5);
+
+    // Nodes
+    const label = (x, y, text, cls, size) => svg('text', { x, y, 'text-anchor': 'middle', class: cls || null, 'font-size': size || 13 }, text);
+    // Captions sit under a node in the wide layout, and beside it in the tall one, where edges run vertically.
+    const caption = (x, y, r, cap, sub) => tall
+      ? [svg('text', { x: x + r + 12, y: y - 2, 'text-anchor': 'start', 'font-size': 13 }, cap), sub ? svg('text', { x: x + r + 12, y: y + 15, 'text-anchor': 'start', class: 'muted', 'font-size': 11.5 }, sub) : null]
+      : [label(x, y + r + 18, cap, null, 13), sub ? label(x, y + r + 34, sub, 'muted', 11.5) : null];
+    function circleNode(x, y, r, big, cap, sub, hot) {
+      g.nodes.append(svg('circle', { cx: x, cy: y, r, class: 'box' + (hot ? ' hot' : '') }), label(x, y + 8, big, 'big', 22), ...caption(x, y, r, cap, sub).filter(Boolean));
+    }
+    circleNode(fx, fy, 30, String(c.openCommands), 'أنت', c.openCommands === 1 ? 'أمر مفتوح' : 'أوامر مفتوحة');
+    circleNode(rx, ry, 30, String(state.pulls.length), 'ينتظر دمجك', 'PR', state.pulls.length > 0);
+    circleNode(mx, my, 30, String(c.merged7), 'الفرع الرئيسي', 'دُمج في 7 أيام');
+    // Core: Damascene eight-point star = Head of Ops
+    const star = (r) => { const pts = []; for (let k = 0; k < 16; k++) { const a = Math.PI / 8 * k - Math.PI / 2, rr = k % 2 ? r * 0.72 : r; pts.push((cx0 + rr * Math.cos(a)).toFixed(1) + ',' + (cy0 + rr * Math.sin(a)).toFixed(1)); } return pts.join(' '); };
+    const coreG = svg('g', { class: 'core' });
+    coreG.append(svg('polygon', { points: star(44), class: 'star' }), svg('g', { class: 'spin' }, svg('rect', { x: cx0 - 22, y: cy0 - 22, width: 44, height: 44, class: 'star-in', transform: `rotate(45 ${cx0} ${cy0})` }), svg('rect', { x: cx0 - 22, y: cy0 - 22, width: 44, height: 44, class: 'star-in' })));
+    const coreSub = c.inProgress ? c.inProgress + ' قيد العمل، ' + c.ready + ' جاهزة' : c.ready + ' جاهزة للمنفّذ';
+    coreG.append(label(cx0, cy0 + 8, String(c.ready + c.inProgress), 'big', 22), ...(tall ? caption(cx0, cy0, 44, 'رئيس العمليات', coreSub) : [label(cx0, cy0 + 62, 'رئيس العمليات', null, 13), label(cx0, cy0 + 78, coreSub, 'muted', 11.5)]));
+    const coreHit = svg('circle', { cx: cx0, cy: cy0, r: 46, class: 'hit', tabindex: 0, role: 'button', 'aria-label': 'رئيس العمليات' }, svg('title', { text: 'رئيس العمليات' }));
+    coreHit.addEventListener('click', () => openDrawer('head-of-ops'));
+    coreHit.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDrawer('head-of-ops'); } });
+    coreG.append(coreHit);
+    g.nodes.append(coreG);
+
+    for (const t of depts) {
+      const list = state.agents.filter((a) => a.department === t.d);
+      const x0 = t.cx - L.dw / 2, y0 = t.cy - L.dh / 2;
+      const busy = flow[t.d].work + flow[t.d].review;
+      g.nodes.append(svg('rect', { x: x0, y: y0, width: L.dw, height: L.dh, rx: 10, class: 'box' }));
+      const nameY = tall ? y0 + 20 : t.cy + 5;
+      g.nodes.append(svg('text', { x: x0 + L.dw - 12, y: nameY, 'text-anchor': 'end', 'font-size': 13 }, DEPT_AR[t.d] || t.d));
+      if (busy) g.nodes.append(svg('text', { x: tall ? x0 + 12 : x0 + L.dw - 12, y: tall ? y0 + 20 : y0 - 6, 'text-anchor': tall ? 'start' : 'end', class: 'muted', 'font-size': 11 }, (flow[t.d].work ? nTasks(flow[t.d].work) : '') + (flow[t.d].work && flow[t.d].review ? '، ' : '') + (flow[t.d].review ? flow[t.d].review + ' PR' : '')));
+      const step = tall ? 17 : 16;
+      list.forEach((a, k) => {
+        const [cls] = agentStatus(a);
+        const ax = tall ? x0 + L.dw - 16 - k * step : x0 + 16 + k * step, ay = tall ? y0 + 40 : t.cy;
+        if (cls === 'working') {
+          const ring = svg('circle', { cx: ax, cy: ay, r: 6, class: 'ring' });
+          if (!reduceMotion) ring.append(svg('animate', { attributeName: 'r', values: '6;12', dur: '2.2s', repeatCount: 'indefinite' }), svg('animate', { attributeName: 'opacity', values: '.8;0', dur: '2.2s', repeatCount: 'indefinite' }));
+          g.nodes.append(ring);
+        }
+        g.nodes.append(svg('circle', { cx: ax, cy: ay, r: 5, class: 'adot ' + cls }));
+        const hit = svg('circle', { cx: ax, cy: ay, r: 8, class: 'hit', tabindex: 0, role: 'button', 'aria-label': (a.name_ar || a.id) + '، ' + agentStatus(a)[1] }, svg('title', { text: (a.name_ar || a.id) + ': ' + agentStatus(a)[1] + (state.working[a.id] ? ' — ' + cleanTitle(state.working[a.id].title) : '') }));
+        hit.addEventListener('click', () => openDrawer(a.id));
+        hit.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDrawer(a.id); } });
+        g.nodes.append(hit);
+      });
+    }
+    svgEl.replaceChildren(g.edges, g.parts, g.nodes);
+    if (reduceMotion) for (const dot of g.parts.querySelectorAll('circle[data-path]')) {
+      const path = svgEl.querySelector('#' + dot.dataset.path); const pt = path.getPointAtLength(path.getTotalLength() * Number(dot.dataset.at));
+      dot.setAttribute('cx', pt.x.toFixed(1)); dot.setAttribute('cy', pt.y.toFixed(1));
+    }
+    state.mapDrawn = true;
+  }
+
+  // ---------- performance ----------
+  const DAY = 864e5;
+  function plural(n, one, two, few, many) { return n === 1 ? '1 ' + one : n === 2 ? two : n >= 3 && n <= 10 ? n + ' ' + few : n + ' ' + many; }
+  const nTasks = (n) => plural(n, 'مهمة', 'مهمتان', 'مهام', 'مهمة');
+  function dayKey(t) { const d = new Date(t); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  function median(xs) { if (!xs.length) return null; const s = [...xs].sort((a, b) => a - b), m = Math.floor(s.length / 2); return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; }
+  function dur(ms) {
+    if (ms === null) return '—';
+    const h = ms / 36e5;
+    if (h < 1) return plural(Math.max(1, Math.round(ms / 6e4)), 'دقيقة', 'دقيقتان', 'دقائق', 'دقيقة');
+    if (h < 48) return plural(Math.round(h), 'ساعة', 'ساعتان', 'ساعات', 'ساعة');
+    return plural(Math.round(h / 24), 'يوم', 'يومان', 'أيام', 'يوماً');
+  }
+  function showTip(e, value, label) {
+    const t = $('tip'); t.replaceChildren(el('b', { text: value }), label);
+    t.style.display = 'block';
+    const r = e.clientX !== undefined && e.clientX !== 0 ? { x: e.clientX, y: e.clientY } : (() => { const b = e.target.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top }; })();
+    t.style.left = Math.min(window.innerWidth - t.offsetWidth - 8, Math.max(8, r.x - t.offsetWidth / 2)) + 'px';
+    t.style.top = Math.max(8, r.y - t.offsetHeight - 12) + 'px';
+  }
+  function hideTip() { $('tip').style.display = 'none'; }
+  function renderPerf() {
+    const box = $('perf');
+    const now = Date.now(), since = now - 14 * DAY;
+    const days = []; for (let k = 13; k >= 0; k--) { const t = now - k * DAY; days.push({ key: dayKey(t), t, n: 0 }); }
+    const byKey = Object.fromEntries(days.map((d) => [d.key, d]));
+    const merged = state.closedPulls.filter((p) => p.merged_at && Date.parse(p.merged_at) >= since);
+    for (const p of merged) { const d = byKey[dayKey(Date.parse(p.merged_at))]; if (d) d.n++; }
+    const tasks = state.recent.filter((i) => i.state === 'closed' && i.closed_at && Date.parse(i.closed_at) >= since && /^\[مهمة\]/.test(i.title) && i.state_reason !== 'not_planned');
+    const perAgent = {};
+    for (const i of tasks) { const a = agentOfIssue(i) || '?'; perAgent[a] = (perAgent[a] || 0) + 1; }
+    const tiles = el('div', { class: 'tiles' },
+      el('div', { class: 'tile' }, el('div', { class: 'n', text: String(tasks.length) }), el('div', { class: 'l', text: tasks.length === 1 ? 'مهمة اكتملت' : 'مهام اكتملت' })),
+      el('div', { class: 'tile' }, el('div', { class: 'n', text: dur(median(tasks.map((i) => Date.parse(i.closed_at) - Date.parse(i.created_at)))) }), el('div', { class: 'l', text: 'من فتح المهمة إلى إغلاقها (الوسيط)' })),
+      el('div', { class: 'tile' }, el('div', { class: 'n', text: dur(median(merged.map((p) => Date.parse(p.merged_at) - Date.parse(p.created_at)))) }), el('div', { class: 'l', text: 'من فتح PR إلى دمجه (الوسيط)' })));
+    const width = Math.max(260, box.clientWidth || 400);
+    // Column chart: merged PRs per day. Time runs right to left, like the page.
+    const H = 150, top = 14, bottom = 22, right = 26, left = 4, plotW = width - right - left, plotH = H - top - bottom;
+    const maxV = Math.max(2, ...days.map((d) => d.n)), tickStep = maxV <= 4 ? 1 : Math.ceil(maxV / 4);
+    const yMax = Math.ceil(maxV / tickStep) * tickStep;
+    const band = plotW / days.length, bw = Math.min(24, band - 4);
+    const col = svg('svg', { viewBox: `0 0 ${width} ${H}`, height: H, role: 'img', 'aria-label': 'PRs دُمجت في كل يوم من آخر 14 يوماً' });
+    for (let v = 0; v <= yMax; v += tickStep) {
+      const y = top + plotH - plotH * v / yMax;
+      col.append(svg('line', { x1: left, x2: left + plotW, y1: y, y2: y, class: 'grid' }), svg('text', { x: width - 4, y: y + 4, 'text-anchor': 'end' }, String(v)));
+    }
+    days.forEach((d, k) => {
+      const xc = left + plotW - band * (k + 0.5);
+      const label = k === days.length - 1 ? 'اليوم' : new Date(d.t).getDate() + '/' + (new Date(d.t).getMonth() + 1);
+      if (k === days.length - 1 || (days.length - 1 - k) % 3 === 0) col.append(svg('text', { x: xc, y: H - 6, 'text-anchor': 'middle' }, k === days.length - 1 ? 'اليوم' : String(new Date(d.t).getDate())));
+      const hit = svg('rect', { x: xc - band / 2, y: top, width: band, height: plotH, class: 'hitbar', tabindex: 0, 'aria-label': label + ': ' + d.n });
+      const tip = (e) => showTip(e, String(d.n) + (d.n === 1 ? ' PR' : ' PRs'), label);
+      hit.addEventListener('pointermove', tip); hit.addEventListener('focus', tip); hit.addEventListener('pointerleave', hideTip); hit.addEventListener('blur', hideTip);
+      col.append(hit);
+      if (d.n > 0) {
+        const h = plotH * d.n / yMax, x = xc - bw / 2, y = top + plotH - h, r = Math.min(4, h);
+        col.append(svg('path', { class: 'mark', d: `M${x} ${top + plotH} V${y + r} Q${x} ${y} ${x + r} ${y} H${x + bw - r} Q${x + bw} ${y} ${x + bw} ${y + r} V${top + plotH} Z`, 'pointer-events': 'none' }));
+      } else col.append(svg('g'));
+    });
+    const kids = [tiles, el('div', { class: 'viz-title', text: 'PRs دُمجت كل يوم' }), el('div', { class: 'viz' }, col)];
+    // Horizontal bars: completed tasks per agent.
+    const rows = Object.entries(perAgent).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    kids.push(el('div', { class: 'viz-title', text: 'مهام اكتملت لكل وكيل' }));
+    if (!rows.length) kids.push(el('div', { class: 'empty', text: 'لم تكتمل مهام بعد. تظهر هنا حين يدمج المؤسس أول PR لمهمة.' }));
+    else {
+      const rowH = 26, nameW = Math.min(170, width * 0.42), hb = svg('svg', { viewBox: `0 0 ${width} ${rows.length * rowH + 4}`, height: rows.length * rowH + 4, role: 'img', 'aria-label': 'مهام اكتملت لكل وكيل' });
+      const maxA = Math.max(...rows.map((r) => r[1])), barMax = width - nameW - 40;
+      rows.forEach(([id, n], k) => {
+        const y = k * rowH + 6, w = Math.max(4, barMax * n / maxA), xR = width - nameW - 8, x = xR - w, r = 4;
+        hb.append(svg('text', { x: width - 2, y: y + 11, 'text-anchor': 'end', class: 'name' }, nameOf(id)));
+        hb.append(svg('path', { class: 'mark', d: `M${xR} ${y} H${x + r} Q${x} ${y} ${x} ${y + r} V${y + 14 - r} Q${x} ${y + 14} ${x + r} ${y + 14} H${xR} Z` }));
+        hb.append(svg('text', { x: x - 6, y: y + 11, 'text-anchor': 'end', class: 'val' }, String(n)));
+      });
+      kids.push(el('div', { class: 'viz' }, hb));
+    }
+    kids.push(el('details', { class: 'table' }, el('summary', { text: 'عرض كجدول' }),
+      el('table', null, el('tr', null, el('th', { text: 'اليوم' }), el('th', { text: 'PRs دُمجت' })), [...days].reverse().map((d) => el('tr', null, el('td', { text: new Date(d.t).toLocaleDateString('ar', { day: 'numeric', month: 'short' }) }), el('td', { text: String(d.n) })))),
+      rows.length ? el('table', null, el('tr', null, el('th', { text: 'الوكيل' }), el('th', { text: 'مهام اكتملت' })), rows.map(([id, n]) => el('tr', null, el('td', { text: nameOf(id) }), el('td', { text: String(n) })))) : null));
+    box.replaceChildren(...kids);
+  }
+
+  // ---------- chat with an agent ----------
+  function parseMsg(body, ts, url) {
+    const text = String(body || '').trim();
+    const m = text.match(/^\s*🤖\s*([a-z0-9-]+)\s*[·:\-]\s*([\s\S]*)$/);
+    if (m) return { who: 'agent', agent: m[1], text: m[2], ts, url };
+    if (text.endsWith(MARK)) return { who: 'me', text: text.slice(0, -MARK.length).trim(), ts, url };
+    return { who: 'other', text, ts, url };
+  }
+  async function loadChat(id) {
+    const thread = $('dr-thread'), status = $('dr-chat-status');
+    const issue = state.chats[id];
+    if (!issue) { thread.replaceChildren(el('div', { class: 'empty', text: 'لا محادثة بعد. اكتب أول رسالة.' })); status.textContent = 'يرد ' + nameOf(id) + ' في تشغيل المنفّذ التالي (' + nextRun(SCHEDULES.exec) + ').'; return; }
+    thread.replaceChildren(el('div', { class: 'empty', text: 'يحمّل المحادثة…' }));
+    try {
+      const comments = await gh(rp() + '/issues/' + issue.number + '/comments?per_page=100');
+      if (state.drawerId !== id) return;
+      const msgs = [parseMsg(issue.body, issue.created_at, issue.html_url), ...comments.map((c) => parseMsg(c.body, c.created_at, c.html_url))].filter((x) => x.text);
+      thread.replaceChildren(...msgs.map((x) => el('div', { class: 'msg msg-' + x.who },
+        el('div', { class: 'meta' }, el('span', { text: x.who === 'me' ? 'أنت' : x.who === 'agent' ? nameOf(x.agent) : 'ملاحظة' }), el('span', { text: ago(x.ts) })),
+        ...mdToNodes(x.text))));
+      thread.scrollTop = thread.scrollHeight;
+      const last = msgs[msgs.length - 1];
+      status.textContent = last && last.who === 'me' ? 'ينتظر رد ' + nameOf(id) + '. يرد في تشغيل المنفّذ التالي (' + nextRun(SCHEDULES.exec) + ').' : '';
+    } catch (e) { thread.replaceChildren(el('div', { class: 'notice', text: 'تعذّر تحميل المحادثة: ' + e.message })); }
+  }
+  async function ensureAgentLabel(id) {
+    const name = 'agent:' + id;
+    if (agentLabels.has(name)) return true;
+    try { await gh(rp() + '/labels', { method: 'POST', body: { name, color: '5B6B8C' } }); agentLabels.add(name); return true; }
+    catch (e) { if (e.status === 422) { agentLabels.add(name); return true; } toast('لم يُنشأ وسم الوكيل: ' + e.message); return false; }
+  }
+  async function sendChat() {
+    const id = state.drawerId, box = $('chat-text'), text = box.value.trim();
+    if (!id || !text) { box.focus(); return; }
+    const btn = $('chat-send'); btn.disabled = true;
+    try {
+      const body = text + '\n\n' + MARK;
+      const issue = state.chats[id];
+      if (issue) await gh(rp() + '/issues/' + issue.number + '/comments', { method: 'POST', body: { body } });
+      else {
+        if (!(await ensureAgentLabel(id))) return;
+        state.chats[id] = await gh(rp() + '/issues', { method: 'POST', body: { title: '💬 محادثة: ' + nameOf(id), body, labels: ['chat', 'agent:' + id] } });
+      }
+      box.value = '';
+      toast('أُرسلت رسالتك إلى ' + nameOf(id) + '. يرد ' + nextRun(SCHEDULES.exec) + '.');
+      await loadChat(id);
+    } catch (e) { toast('لم تُرسل: ' + e.message); } finally { btn.disabled = false; }
+  }
+  async function chatToCommand() {
+    const id = state.drawerId, text = $('chat-text').value.trim();
+    if (!text) { toast('اكتب ما تريد أولاً، ثم حوّله لأمر.'); $('chat-text').focus(); return; }
+    if (await createCommand(text, id, 'عادية')) $('chat-text').value = '';
+  }
+
   // ---------- drawer ----------
   function openDrawer(id) {
     const a = state.agents.find((x) => x.id === id); if (!a) return;
@@ -610,8 +1022,10 @@
     const acts = state.log.filter((e) => e.agent === a.id).slice(0, 10);
     $('dr-activity').replaceChildren(...(acts.length ? acts.map(feedEntry) : [el('div', { class: 'empty', text: 'لا نشاط بعد.' })]));
     $('scrim').style.display = 'block'; $('drawer').classList.add('open'); $('drawer').setAttribute('aria-hidden', 'false'); $('dr-close').focus();
+    state.drawerId = a.id; $('chat-text').value = ''; $('chat-text').placeholder = 'اسأل ' + (a.name_ar || a.id) + '، أو ناقشه في فكرة…';
+    loadChat(a.id);
   }
-  function closeDrawer() { $('scrim').style.display = 'none'; $('drawer').classList.remove('open'); $('drawer').setAttribute('aria-hidden', 'true'); }
+  function closeDrawer() { state.drawerId = null; hideTip(); $('scrim').style.display = 'none'; $('drawer').classList.remove('open'); $('drawer').setAttribute('aria-hidden', 'true'); }
 
   // ---------- feed ----------
   function feedEntry(e) {
@@ -649,13 +1063,20 @@
       }
     } catch (e) { return ['الحالة غير معروفة', '', true]; }
   }
-  async function renderPending(pulls, issues) {
-    const total = pulls.length + issues.length;
+  async function renderPending(pulls, issues, reviews) {
+    const total = pulls.length + issues.length + reviews.length;
     const c = $('pending-count'); c.textContent = total; c.classList.toggle('brass', total > 0);
     const box = $('pending');
     if (!total) { box.replaceChildren(el('div', { class: 'empty', text: 'لا شيء ينتظرك الآن.' })); return; }
     const checks = await Promise.all(pulls.map(checksFor));
-    const items = pulls.map((p, k) => {
+    const items = reviews.map((i) => el('div', { class: 'item' },
+      el('div', { class: 'title' }, link(i.html_url, cleanTitle(i.title))),
+      el('div', { class: 'meta' }, el('span', { class: 'tag ok', text: '📦 سُلّم ' + iso(i.number) }), el('span', { text: 'اقرأ «التسليم» وجرّب الناتج' })),
+      el('div', { class: 'actions' },
+        el('button', { class: 'btn go small', onclick: () => closeCommand(i) }, 'تم، أغلق الأمر'),
+        el('button', { class: 'btn small', onclick: () => requestChanges(i.number, 'review') }, 'طلب تعديل'))
+    ));
+    items.push(...pulls.map((p, k) => {
       const [ct, cc, ok] = checks[k];
       return el('div', { class: 'item' },
         el('div', { class: 'title' }, link(p.html_url, p.title)),
@@ -664,7 +1085,7 @@
           el('button', { class: 'btn go small', disabled: p.draft || !ok ? true : null, onclick: () => approvePR(p) }, 'موافقة ودمج'),
           el('button', { class: 'btn small', onclick: () => requestChanges(p.number, 'PR') }, 'طلب تعديل'))
       );
-    });
+    }));
     for (const i of issues) items.push(el('div', { class: 'item' },
       el('div', { class: 'title' }, link(i.html_url, i.title)),
       el('div', { class: 'meta' }, el('span', { class: 'tag wait', text: 'قرار ' + iso(i.number) }), el('span', { text: ago(i.created_at) })),
@@ -677,13 +1098,30 @@
   }
 
   // ---------- commands, human tasks ----------
+  function commandStatus(i, steps) {
+    if (i.state !== 'open') return ['أُغلق', 'ok'];
+    if (hasLabel(i, 'review')) return ['سُلّم، ينتظر مراجعتك', 'ok'];
+    if (hasLabel(i, 'for-chat')) return ['في محادثة Claude', 'wait'];
+    if (steps.length || hasLabel(i, 'in-progress')) return ['قيد التنفيذ', 'wait'];
+    return ['ينتظر خطة رئيس العمليات (' + nextRun(SCHEDULES.hoo) + ')', ''];
+  }
   function renderCommands(list) {
     const box = $('commands');
     if (!list.length) { box.replaceChildren(el('div', { class: 'empty', text: 'لم ترسل أوامر بعد. اكتب أمرك في الشريط أسفل الصفحة.' })); return; }
-    box.replaceChildren(...list.map((i) => el('div', { class: 'item' },
-      el('div', { class: 'title' }, link(i.html_url, i.title)),
-      el('div', { class: 'meta' }, el('span', { class: 'tag ' + (i.state === 'open' ? 'wait' : 'ok'), text: i.state === 'open' ? 'قيد المتابعة' : 'أُغلق' }), el('span', { text: iso(i.number) }), el('span', { text: ago(i.created_at) }), i.comments ? el('span', { text: i.comments + ' تعليق' }) : null)
-    )));
+    box.replaceChildren(...list.map((i) => {
+      const steps = state.steps[i.number] || [];
+      const done = steps.filter((x) => x.state === 'closed').length;
+      const [st, cls] = commandStatus(i, steps);
+      return el('div', { class: 'item' },
+        el('div', { class: 'title' }, link(i.html_url, cleanTitle(i.title))),
+        el('div', { class: 'meta' }, el('span', { class: 'tag ' + cls, text: st }), el('span', { text: iso(i.number) }), el('span', { text: ago(i.created_at) }), steps.length ? el('span', { text: done + ' من ' + steps.length + ' خطوات' }) : null),
+        steps.length ? el('div', { class: 'bar', role: 'img', 'aria-label': done + ' من ' + steps.length + ' خطوات مكتملة' }, el('i', { style: 'width:' + Math.round(100 * done / steps.length) + '%' })) : null,
+        steps.length && i.state === 'open' ? el('ul', { class: 'steps' }, steps.slice(0, 8).map((x) => {
+          const lab = x.state === 'closed' ? 'اكتملت' : hasLabel(x, 'in-progress') ? 'يعمل عليها ' + nameOf((labelNames(x).find((n) => n.startsWith('agent:')) || '').slice(6)) : hasLabel(x, 'in-review') ? 'PR ينتظر دمجك' : hasLabel(x, 'ready') ? 'جاهزة' : hasLabel(x, 'queued') ? 'تنتظر خطوة سابقة' : hasLabel(x, 'blocked') ? 'متوقفة' : 'مفتوحة';
+          return el('li', { class: x.state === 'closed' ? 'done' : null }, link(x.html_url, cleanTitle(x.title)), el('span', { text: lab }));
+        })) : null
+      );
+    }));
   }
   function renderHuman(list) {
     $('human-count').textContent = list.length;
@@ -738,18 +1176,22 @@
   // ---------- actions ----------
   async function sendCommand() {
     const text = $('cmd-text').value.trim(); if (!text) { $('cmd-text').focus(); return; }
-    const agent = $('cmd-agent').value, priority = $('cmd-priority').value;
+    const btn = $('cmd-send'); btn.disabled = true;
+    const ok = await createCommand(text, $('cmd-agent').value, $('cmd-priority').value);
+    btn.disabled = false;
+    if (ok) { $('cmd-text').value = ''; autosize(); }
+  }
+  async function createCommand(text, agent, priority) {
     const first = text.split(/\r?\n/)[0].trim();
     const title = '[أمر] ' + (first.length > 70 ? first.slice(0, 70) + '…' : first);
     const body = ['### المطلوب', '', text, '', '### الأولوية', '', priority, '', '### الوكيل المقترح', '', agent ? nameOf(agent) + ' (`' + agent + '`)' : 'رئيس العمليات يختار', '', MARK].join('\n');
     const labels = ['command']; if (agent && agentLabels.has('agent:' + agent)) labels.push('agent:' + agent);
-    const btn = $('cmd-send'); btn.disabled = true;
     try {
       const issue = await gh(rp() + '/issues', { method: 'POST', body: { title, body, labels } });
-      $('cmd-text').value = ''; autosize();
-      toast('أُرسل الأمر ' + iso(issue.number) + '. يلتقطه رئيس العمليات في دورته التالية، أو فوراً إن ضغطت Run now على مهمته.', issue.html_url);
+      toast('أُرسل الأمر ' + iso(issue.number) + '. يكتب رئيس العمليات خطته ' + nextRun(SCHEDULES.hoo) + '، أو فوراً إن ضغطت Run now على مهمته.', issue.html_url);
       loadAll();
-    } catch (e) { toast('لم يُرسل الأمر: ' + e.message); } finally { btn.disabled = false; }
+      return true;
+    } catch (e) { toast('لم يُرسل الأمر: ' + e.message); return false; }
   }
   async function approvePR(p) {
     const ok = await modal({ title: 'موافقة ودمج PR ' + iso(p.number), body: p.title + '\n\nسيُدمج في ' + p.base.ref + ' باسمك. التراجع يكون بـ PR جديد.', okText: 'دمج', okClass: 'go' });
@@ -772,10 +1214,20 @@
   const approveIssue = (i) => decide(i, true);
   const rejectIssue = (i) => decide(i, false);
   async function requestChanges(n, kind) {
-    const text = await modal({ title: (kind === 'PR' ? 'طلب تعديل على PR ' : 'تعليق على ') + iso(n), input: 'ما الذي تريد تغييره؟', okText: 'إرسال' });
+    const asks = kind === 'PR' || kind === 'review';
+    const text = await modal({ title: (kind === 'PR' ? 'طلب تعديل على PR ' : kind === 'review' ? 'طلب تعديل على الأمر ' : 'تعليق على ') + iso(n), input: 'ما الذي تريد تغييره؟', okText: 'إرسال' });
     if (!text) return;
-    try { const c = await gh(rp() + '/issues/' + n + '/comments', { method: 'POST', body: { body: (kind === 'PR' ? '🔁 **طلب تعديل من المؤسس**\n\n' : '') + text + '\n\n' + MARK } }); toast('أُرسل تعليقك على ' + iso(n) + '.', c.html_url); }
+    try { const c = await gh(rp() + '/issues/' + n + '/comments', { method: 'POST', body: { body: (asks ? '🔁 **طلب تعديل من المؤسس**\n\n' : '') + text + '\n\n' + MARK } }); toast('أُرسل تعليقك على ' + iso(n) + '.', c.html_url); }
     catch (e) { toast('لم يُرسل: ' + e.message); }
+  }
+  async function closeCommand(i) {
+    const ok = await modal({ title: 'قبول التسليم وإغلاق الأمر ' + iso(i.number), body: cleanTitle(i.title) + '\n\nيُغلق الأمر بعد تعليق قبول باسمك. لطلب شيء جديد أرسل أمراً جديداً.', okText: 'أغلق الأمر', okClass: 'go' });
+    if (!ok) return;
+    try {
+      await gh(rp() + '/issues/' + i.number + '/comments', { method: 'POST', body: { body: '✅ **قبول التسليم**\n\n' + MARK } });
+      await gh(rp() + '/issues/' + i.number, { method: 'PATCH', body: { state: 'closed', state_reason: 'completed' } });
+      toast('أُغلق الأمر ' + iso(i.number) + '.', i.html_url); loadAll();
+    } catch (e) { toast('لم يُغلق: ' + e.message, i.html_url); }
   }
 
   // ---------- command bar: text / voice ----------
@@ -802,6 +1254,7 @@
   function tick() {
     const f = (tz) => { try { return new Intl.DateTimeFormat('ar', { timeZone: tz, hour: '2-digit', minute: '2-digit' }).format(new Date()); } catch (e) { return '--:--'; } };
     $('clock-ams').textContent = f('Europe/Amsterdam'); $('clock-dam').textContent = f('Asia/Damascus');
+    $('next-exec').textContent = nextRun(SCHEDULES.exec); $('next-hoo').textContent = nextRun(SCHEDULES.hoo);
   }
 
   // ---------- setup / session ----------
@@ -846,6 +1299,11 @@
     $('mode-voice').addEventListener('click', () => setMode(true));
     $('mic').addEventListener('click', toggleMic);
     $('dr-close').addEventListener('click', closeDrawer);
+    $('chat-send').addEventListener('click', sendChat);
+    $('chat-to-cmd').addEventListener('click', chatToCommand);
+    $('chat-text').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) sendChat(); });
+    let resizeTimer = 0;
+    window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (!token || !state.agents.length) return; state.mapSig = ''; renderHero(lastCounts); renderPerf(); }, 200); });
     $('scrim').addEventListener('click', closeDrawer);
     tick(); setInterval(tick, 30000);
     setInterval(() => { if (token && document.visibilityState === 'visible') loadAll(); }, 60000);

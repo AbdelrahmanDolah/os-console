@@ -545,7 +545,7 @@
     if (next === undefined) { next = slots[0]; tomorrow = true; }
     const diff = (tomorrow ? next + 1440 : next) - now;
     const hhmm = String(Math.floor(next / 60)).padStart(2, '0') + ':' + String(next % 60).padStart(2, '0');
-    if (diff < 60) return 'بعد ' + diff + ' دقيقة';
+    if (diff < 60) return diff === 1 ? 'بعد دقيقة' : diff === 2 ? 'بعد دقيقتين' : diff <= 10 ? 'بعد ' + diff + ' دقائق' : 'بعد ' + diff + ' دقيقة';
     return (tomorrow ? 'غداً ' : '') + hhmm;
   }
   const cleanTitle = (t) => String(t || '').replace(/^\[(مهمة|أمر)\]\s*/, '').replace(/^\(\d+\/\d+\)\s*/, '');

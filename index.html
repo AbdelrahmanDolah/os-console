@@ -100,6 +100,8 @@
   .dot.working { background: var(--olive); border-color: var(--olive); box-shadow: 0 0 0 0 rgba(143,191,90,.55); animation: breathe 2.4s ease-out infinite; }
   @keyframes breathe { 0% { box-shadow: 0 0 0 0 rgba(143,191,90,.55); } 70% { box-shadow: 0 0 0 8px rgba(143,191,90,0); } 100% { box-shadow: 0 0 0 0 rgba(143,191,90,0); } }
   @media (prefers-reduced-motion: reduce) { .dot.working { animation: none; } }
+  .dot.stalled { background: var(--brass-soft); border-color: var(--brass); border-style: dashed; }
+  @media (max-width: 560px) { .session { flex-wrap: wrap; white-space: normal; } }
   .legend { display: flex; gap: 16px; flex-wrap: wrap; color: var(--stone); font-size: 12.5px; margin-top: 12px; }
   .legend span { display: inline-flex; align-items: center; gap: 6px; }
 
@@ -185,6 +187,17 @@
   .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-inline-start: auto; }
   .chip { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; font-size: 12.5px; color: var(--stone); white-space: nowrap; }
   .chip b { color: var(--jasmine); font-weight: 600; }
+  .chip.off { border-color: var(--pomegranate); color: var(--pomegranate); }
+  .chip.off b { color: var(--pomegranate); }
+  .col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  .sent { border-top: 1px solid var(--line); padding: 10px 0; }
+  .sent:first-child { border-top: 0; padding-top: 2px; }
+  .sent .what { font-size: 13.5px; unicode-bidi: plaintext; color: var(--jasmine); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .status-line { font-size: 12.5px; margin-top: 4px; display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap; }
+  .status-line.done { color: var(--olive); }
+  .status-line.wait { color: var(--brass); }
+  .status-line.off { color: var(--pomegranate); }
+  .btn.busy { opacity: .7; cursor: progress; }
   #map { width: 100%; height: auto; display: block; margin-top: 6px; direction: ltr; }
   #map.tall { max-width: 460px; margin-inline: auto; }
   #map text { fill: var(--jasmine); font-family: var(--ui); }
@@ -208,6 +221,7 @@
   #map .adot.active { fill: rgba(143,191,90,.25); stroke: var(--olive); }
   #map .adot.reading { fill: rgba(214,166,75,.25); stroke: var(--brass); }
   #map .adot.working { fill: var(--olive); stroke: var(--olive); }
+  #map .adot.stalled { fill: rgba(214,166,75,.25); stroke: var(--brass); stroke-dasharray: 2 2; }
   #map .ring { fill: none; stroke: var(--olive); stroke-width: 1.5; }
   #map .hit { fill: transparent; cursor: pointer; }
   #map .hit:focus-visible { outline: none; stroke: var(--brass); stroke-width: 2; }
@@ -315,8 +329,8 @@
       <div class="hero-head">
         <h2 id="hero-title">المنظومة الآن</h2>
         <div class="chips">
-          <span class="chip">المنفّذ يعمل <b id="next-exec">—</b></span>
-          <span class="chip">رئيس العمليات <b id="next-hoo">—</b></span>
+          <span id="chip-exec" class="chip">المنفّذ <b id="next-exec">—</b></span>
+          <span id="chip-hoo" class="chip">رئيس العمليات <b id="next-hoo">—</b></span>
         </div>
       </div>
       <p id="story" class="story"></p>
@@ -329,16 +343,23 @@
         <div id="depts" class="depts"></div>
         <div class="legend">
           <span><i class="dot working" aria-hidden="true"></i>يعمل الآن</span>
+          <span><i class="dot stalled" aria-hidden="true"></i>مهمته متوقفة</span>
           <span><i class="dot active" aria-hidden="true"></i>نشِط</span>
           <span><i class="dot reading" aria-hidden="true"></i>قراءة فقط</span>
           <span><i class="dot" aria-hidden="true"></i>مصمَّم، لم يبدأ</span>
         </div>
       </section>
 
-      <section class="panel" aria-labelledby="pending-title">
-        <h2 id="pending-title">ينتظر قرارك <span id="pending-count" class="count">0</span></h2>
-        <div id="pending"></div>
-      </section>
+      <div class="col">
+        <section class="panel" aria-labelledby="pending-title">
+          <h2 id="pending-title">ينتظر قرارك <span id="pending-count" class="count">0</span></h2>
+          <div id="pending"></div>
+        </section>
+        <section class="panel" aria-labelledby="outbox-title">
+          <h2 id="outbox-title">طلباتك <span id="outbox-count" class="count">0</span></h2>
+          <div id="outbox"></div>
+        </section>
+      </div>
 
       <section class="panel" aria-labelledby="feed-title">
         <h2 id="feed-title">ما يحدث الآن</h2>
@@ -443,17 +464,49 @@
   };
   const STAGE_AR = { 'designed': 'مصمَّم', 'read-only': 'قراءة فقط', 'write-with-approval': 'نشِط', 'live': 'LIVE' };
 
-  // Schedules of the two scheduled tasks, in Amsterdam minutes since midnight (docs/os/execution-loop.md).
-  const SCHEDULES = { exec: [550, 670, 790, 910, 1030, 1150, 1270, 1390], hoo: [460, 1180] };
+  // Run state of the two scheduled tasks comes from ops/schedules.json in the private repo.
+  // Without that file the console does not guess: it says the schedule is not recorded.
+  const SCHED = { exec: null, hoo: null };
+  const toMin = (t) => { const m = String(t).match(/^(\d{1,2}):(\d{2})$/); return m ? Number(m[1]) * 60 + Number(m[2]) : null; };
+  function parseSchedules(text) {
+    SCHED.exec = null; SCHED.hoo = null;
+    if (!text) return;
+    try {
+      const j = JSON.parse(text), t = j && j.tasks || {};
+      for (const [key, id] of [['exec', 'executor'], ['hoo', 'head-of-ops']]) {
+        const x = t[id]; if (!x) continue;
+        SCHED[key] = { enabled: x.enabled === true, slots: (Array.isArray(x.times) ? x.times : []).map(toMin).filter((v) => v !== null).sort((a, b) => a - b), note: String(x.note || '') };
+      }
+    } catch (e) { /* malformed file: treat as not recorded */ }
+  }
+  // Text that completes «… يلتقطها المنفّذ <when>».
+  function when(key) {
+    const x = SCHED[key];
+    if (!x) return 'حين يُشغَّل (المواعيد غير مسجّلة)';
+    if (!x.enabled || !x.slots.length) return 'حين تشغّله بـ Run now (مهمته المجدولة متوقفة)';
+    return nextRun(x.slots);
+  }
+  const handlerOf = { exec: 'المنفّذ', hoo: 'رئيس العمليات' };
+  function chips() {
+    for (const [key, chip, val] of [['exec', 'chip-exec', 'next-exec'], ['hoo', 'chip-hoo', 'next-hoo']]) {
+      const x = SCHED[key];
+      $(val).textContent = !x ? 'غير مسجّل' : !x.enabled ? 'متوقف' : nextRun(x.slots);
+      $(chip).classList.toggle('off', !!x && !x.enabled);
+      $(chip).title = x && x.note ? x.note : '';
+    }
+  }
   const MAP_DEPTS = ['market-regulatory', 'customers-growth', 'product-engineering', 'operations-support', 'sourcing-partners', 'finance'];
   const SVGNS = 'http://www.w3.org/2000/svg';
+  const STALE_MS = 6 * 36e5; // an in-progress task with no activity for 6 hours is shown as stalled
   const reduceMotion = (() => { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
 
   let token = '', repo = '';
   let agentLabels = new Set();
   let refreshing = false;
   let lastCounts = null;
-  const state = { agents: [], log: [], openIssues: [], recent: [], closedPulls: [], pulls: [], working: {}, openBy: {}, chats: {}, steps: {}, mapSig: '', mapDrawn: false, drawerId: null };
+  let sentActions = [];
+  let reloadAfter = false;
+  const state = { agents: [], log: [], openIssues: [], recent: [], closedPulls: [], pulls: [], working: {}, stalled: {}, openBy: {}, chats: {}, steps: {}, mapSig: '', mapDrawn: false, drawerId: null };
   const $ = (id) => document.getElementById(id);
 
   // ---------- storage ----------
@@ -622,24 +675,28 @@
     return out;
   }
   const byNewest = (a, b) => (Date.parse(b.ts) || 0) - (Date.parse(a.ts) || 0);
-  function nameOf(id) { const a = state.agents.find((x) => x.id === id); return a ? (a.name_ar || id) : (id === 'claude-setup' ? 'الإعداد' : id); }
+  function nameOf(id) { const a = state.agents.find((x) => x.id === id); return a ? (a.name_ar || id) : (id === 'claude-setup' || id === 'founder-chat' ? 'Claude في محادثتك' : id); }
 
   // ---------- data ----------
-  async function loadAll() {
-    if (refreshing) return;
-    refreshing = true; $('refresh-btn').disabled = true;
+  async function loadAll(manual) {
+    if (refreshing) { reloadAfter = true; if (manual) toast('التحديث جارٍ الآن…'); return; }
+    refreshing = true;
+    const rb = $('refresh-btn'); rb.disabled = true; rb.classList.add('busy'); rb.textContent = 'يحدّث…';
+    if (manual) state.mapSig = '';
     try {
-      const [registryText, logText, openIssues, pulls, commands, briefsDir, recentComments, closedPulls, recentAll] = await Promise.all([
+      const [registryText, logText, openIssues, pulls, commands, briefsDir, recentComments, closedPulls, recentAll, schedText] = await Promise.all([
         rawFile('agents/registry.yaml'),
         rawFile('ops/activity-log.jsonl'),
         gh(rp() + '/issues?state=open&per_page=100'),
         gh(rp() + '/pulls?state=open&per_page=50'),
         gh(rp() + '/issues?state=all&labels=command&per_page=12&sort=created&direction=desc'),
         gh(rp() + '/contents/ops/briefs').catch((e) => (e.status === 404 ? [] : Promise.reject(e))),
-        gh(rp() + '/issues/comments?sort=created&direction=desc&per_page=60').catch(() => []),
+        gh(rp() + '/issues/comments?sort=created&direction=desc&per_page=100').catch(() => []),
         gh(rp() + '/pulls?state=closed&sort=updated&direction=desc&per_page=50').catch(() => []),
-        gh(rp() + '/issues?state=all&sort=created&direction=desc&per_page=100').catch(() => [])
+        gh(rp() + '/issues?state=all&sort=created&direction=desc&per_page=100').catch(() => []),
+        rawFile('ops/schedules.json').catch(() => null)
       ]);
+      parseSchedules(schedText);
       state.agents = registryText ? parseRegistry(registryText) : [];
       state.log = [...agentComments(recentComments), ...parseLog(logText || '')].sort(byNewest);
       const issues = openIssues.filter((i) => !i.pull_request);
@@ -647,14 +704,15 @@
       state.pulls = pulls;
       state.closedPulls = closedPulls;
       state.recent = recentAll.filter((i) => !i.pull_request);
-      state.working = {}; state.openBy = {}; state.chats = {}; state.steps = {};
+      sentActions = buildSent(Array.isArray(recentComments) ? recentComments : [], recentAll, pulls, closedPulls);
+      state.working = {}; state.stalled = {}; state.openBy = {}; state.chats = {}; state.steps = {};
       for (const i of issues) for (const n of labelNames(i)) {
         if (!n.startsWith('agent:')) continue;
         const id = n.slice(6);
         if (hasLabel(i, 'chat')) { if (!state.chats[id] || i.number < state.chats[id].number) state.chats[id] = i; continue; }
         if (hasLabel(i, 'command')) continue;
         (state.openBy[id] = state.openBy[id] || []).push(i);
-        if (hasLabel(i, 'in-progress')) state.working[id] = i;
+        if (hasLabel(i, 'in-progress')) { if (Date.now() - Date.parse(i.updated_at || 0) > STALE_MS) state.stalled[id] = i; else state.working[id] = i; }
       }
       for (const i of state.recent) { const par = parentOf(i.body); if (par) (state.steps[par] = state.steps[par] || []).push(i); }
       for (const k of Object.keys(state.steps)) state.steps[k].sort((a, b) => a.number - b.number);
@@ -678,22 +736,107 @@
       renderCommands(commands.filter((i) => !i.pull_request));
       renderPerf();
       renderHuman(issues.filter((i) => hasLabel(i, 'human-task')));
+      renderOutbox();
+      chips();
       await renderPending(pulls, approvals, reviews);
       await renderBrief(Array.isArray(briefsDir) ? briefsDir : [], issues.find((i) => hasLabel(i, 'brief')));
-      $('refreshed').textContent = 'محدَّث ' + new Date().toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit' });
+      const stamp = new Date().toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      $('refreshed').textContent = 'محدَّث ' + stamp;
       $('live-dot').className = 'pulse-dot';
       $('load-error').classList.add('hidden');
+      if (manual) toast('تم التحديث ' + stamp + '. البيانات كما هي الآن في GitHub.');
     } catch (e) {
       $('live-dot').className = 'pulse-dot err';
       if (e.status === 401) { forget(); showSetup('الرمز لم يعد صالحاً. أنشئ رمزاً جديداً والصقه هنا.'); }
       else { const b = $('load-error'); b.textContent = 'تعذّر تحميل البيانات: ' + e.message + ' اضغط «تحديث» للمحاولة مجدداً.'; b.classList.remove('hidden'); }
-    } finally { refreshing = false; $('refresh-btn').disabled = false; }
+    } finally {
+      refreshing = false; rb.disabled = false; rb.classList.remove('busy'); rb.textContent = 'تحديث';
+      if (reloadAfter) { reloadAfter = false; setTimeout(() => loadAll(), 0); }
+    }
   }
   function setNum(id, n) { $(id).textContent = String(n); }
+
+  // ---------- what the founder sent, and whether an agent picked it up ----------
+  // A founder action is any comment or issue body ending with the console mark.
+  // It counts as picked up when a comment starting with 🤖 lands on the same issue after it.
+  function kindOf(body, issueLabels, isPR) {
+    const b = String(body || '').trim();
+    if (b.startsWith('🔁')) return isPR ? 'طلب تعديل على PR' : 'طلب تعديل';
+    if (b.startsWith('✅ **قبول التسليم')) return 'قبول التسليم';
+    if (b.startsWith('✅')) return 'موافقة';
+    if (b.startsWith('⛔')) return 'رفض';
+    if (issueLabels.includes('chat')) return 'رسالة';
+    if (issueLabels.includes('command')) return 'أمر';
+    return 'تعليق';
+  }
+  function handlerFor(labels, isPR) {
+    if (labels.includes('for-chat')) return { who: 'Claude في محادثتك', key: null };
+    if (isPR || labels.includes('chat')) return { who: 'المنفّذ', key: 'exec' };
+    return { who: 'رئيس العمليات', key: 'hoo' };
+  }
+  function buildSent(comments, recentAll, pulls, closedPulls) {
+    const byNum = new Map();
+    for (const i of recentAll) byNum.set(i.number, i);
+    for (const p of [...pulls, ...closedPulls]) if (!byNum.has(p.number)) byNum.set(p.number, Object.assign({ pull_request: {} }, p));
+    const numOf = (c) => Number((String(c.issue_url || '').match(/\/(\d+)$/) || [])[1]);
+    const out = [];
+    const mine = (body) => String(body || '').trim().endsWith(MARK);
+    for (const c of comments) if (mine(c.body)) out.push({ num: numOf(c), ts: c.created_at, body: c.body, url: c.html_url });
+    for (const i of recentAll) if (!i.pull_request && mine(i.body) && (hasLabel(i, 'command') || hasLabel(i, 'chat'))) out.push({ num: i.number, ts: i.created_at, body: i.body, url: i.html_url, opened: true });
+    const since = Date.now() - 14 * 864e5;
+    return out.filter((a) => Date.parse(a.ts) >= since).sort((a, b) => Date.parse(b.ts) - Date.parse(a.ts)).slice(0, 10).map((a) => {
+      const issue = byNum.get(a.num) || {};
+      const isPR = !!issue.pull_request || /\/pull\//.test(a.url || '');
+      const labels = labelNames(issue);
+      const later = comments.filter((c) => numOf(c) === a.num && Date.parse(c.created_at) > Date.parse(a.ts) && /^\s*🤖/.test(c.body || '')).sort((x, y) => Date.parse(x.created_at) - Date.parse(y.created_at));
+      const reply = later[0];
+      // Done = an agent wrote that it handled it (✅ عولج) or posted a new delivery (📦 التسليم).
+      const doneC = later.find((c) => /✅\s*عولج|📦\s*التسليم/.test(String(c.body || '').split(/\r?\n/)[0]));
+      const kind = kindOf(a.body, labels, isPR);
+      const text = String(a.body || '').replace(MARK, '').replace(/^[🔁✅⛔]\s*\*\*[^*]+\*\*\s*/u, '').replace(/^###[^\n]*\n+/, '').trim().split(/\r?\n/).filter(Boolean)[0] || '';
+      const m = reply ? String(reply.body).match(/^\s*🤖\s*([a-z0-9-]+)/) : null;
+      const md = doneC ? String(doneC.body).match(/^\s*🤖\s*([a-z0-9-]+)/) : null;
+      return { num: a.num, ts: a.ts, url: a.url, kind, text, title: issue.title || '', closed: issue.state === 'closed', handler: handlerFor(labels, isPR),
+        reply: reply ? { who: m ? nameOf(m[1]) : 'وكيل', ts: reply.created_at, url: reply.html_url } : null,
+        done: doneC ? { who: md ? nameOf(md[1]) : 'وكيل', ts: doneC.created_at, url: doneC.html_url } : null };
+    });
+  }
+  function sentStatus(a) {
+    const isChange = a.kind.startsWith('طلب تعديل');
+    if (isChange && a.done) return ['done', '✓ عولج: ' + a.done.who + ' ' + ago(a.done.ts), a.done.url];
+    if (isChange && a.closed) return ['done', '✓ أُغلق', null];
+    if (isChange && a.reply) return ['wait', 'استلمه ' + a.reply.who + ' ' + ago(a.reply.ts) + '، ولم يُعالج بعد', a.reply.url];
+    if (a.reply) return ['done', '✓ استلمه ' + a.reply.who + ' ' + ago(a.reply.ts), a.reply.url];
+    if (a.kind === 'قبول التسليم') return ['done', a.closed ? '✓ أُغلق الأمر' : 'أُرسل', null];
+    if (a.closed) return ['done', '✓ أُغلق', null];
+    const h = a.handler;
+    if (!h.key) return ['wait', 'وصل، لم يُعالج بعد. يعالجه ' + h.who + ' حين تكتب له هناك', null];
+    const x = SCHED[h.key];
+    if (x && !x.enabled) return ['off', 'وصل، لم يُعالج بعد. ' + h.who + ' متوقف: شغّله بـ Run now', null];
+    return ['wait', 'وصل، لم يُعالج بعد. يعالجه ' + h.who + ' ' + when(h.key), null];
+  }
+  // The latest unanswered change request on an issue or PR, if any.
+  function openChangeRequest(num) {
+    return sentActions.find((a) => a.num === num && a.kind.startsWith('طلب تعديل') && !a.done && !a.closed) || null;
+  }
+  function renderOutbox() {
+    const box = $('outbox');
+    const waiting = sentActions.filter((a) => sentStatus(a)[0] !== 'done').length;
+    const c = $('outbox-count'); c.textContent = waiting; c.classList.toggle('brass', waiting > 0);
+    if (!sentActions.length) { box.replaceChildren(el('div', { class: 'empty', text: 'لم ترسل شيئاً من اللوحة في آخر 14 يوماً. كل أمر أو موافقة أو طلب تعديل ترسله يظهر هنا مع حالته.' })); return; }
+    box.replaceChildren(...sentActions.map((a) => {
+      const [cls, line, href] = sentStatus(a);
+      return el('div', { class: 'sent' },
+        el('div', { class: 'meta' }, el('span', { class: 'tag ' + (a.kind.startsWith('طلب تعديل') ? 'wait' : ''), text: a.kind }), link(a.url, iso(a.num)), el('span', { text: ago(a.ts) })),
+        el('div', { class: 'what', text: a.text || cleanTitle(a.title) }),
+        el('div', { class: 'status-line ' + cls }, el('span', { text: line }), href ? link(href, 'اقرأ الرد') : null));
+    }));
+  }
 
   // ---------- workforce map ----------
   function agentStatus(a) {
     if (state.working[a.id]) return ['working', 'يعمل الآن'];
+    if (state.stalled[a.id]) return ['stalled', 'مهمته متوقفة ' + ago(state.stalled[a.id].updated_at)];
     if (a.stage === 'write-with-approval' || a.stage === 'live') return ['active', STAGE_AR[a.stage]];
     if (a.stage === 'read-only') return ['reading', STAGE_AR[a.stage]];
     return ['', STAGE_AR[a.stage] || String(a.stage || 'مصمَّم')];
@@ -733,17 +876,20 @@
   function deptOf(id) { const a = state.agents.find((x) => x.id === id); return a ? a.department : null; }
   function agentOfIssue(i) { const n = labelNames(i).find((x) => x.startsWith('agent:')); return n ? n.slice(6) : null; }
   function renderHero(c) {
-    $('next-exec').textContent = nextRun(SCHEDULES.exec);
-    $('next-hoo').textContent = nextRun(SCHEDULES.hoo);
+    chips();
     // Story: one honest sentence about what is happening now.
     const parts = [];
     const working = Object.entries(state.working);
+    const stalled = Object.entries(state.stalled);
     if (working.length === 1) parts.push(nameOf(working[0][0]) + ' يعمل الآن على «' + cleanTitle(working[0][1].title) + '».');
     else if (working.length > 1) parts.push((working.length === 2 ? 'وكيلان يعملان' : working.length + ' وكلاء يعملون') + ' الآن: ' + working.map(([id]) => nameOf(id)).join('، ') + '.');
-    else if (c.ready) parts.push((c.ready === 1 ? 'مهمة جاهزة' : c.ready === 2 ? 'مهمتان جاهزتان' : c.ready + ' مهام جاهزة') + '، يلتقطها المنفّذ ' + nextRun(SCHEDULES.exec) + '.');
-    else parts.push('لا عمل جارٍ الآن.');
+    else if (!stalled.length && !c.ready) parts.push('لا عمل جارٍ الآن.');
+    const waitBits = [];
+    if (stalled.length) waitBits.push(stalled.length === 1 ? 'المهمة ' + iso(stalled[0][1].number) + ' عند ' + nameOf(stalled[0][0]) + ' متوقفة، آخر نشاط فيها ' + ago(stalled[0][1].updated_at) : stalled.length + ' مهام متوقفة بلا نشاط منذ 6 ساعات أو أكثر');
+    if (c.ready) waitBits.push(c.ready === 1 ? 'مهمة جاهزة تنتظر' : c.ready === 2 ? 'مهمتان جاهزتان تنتظران' : c.ready + ' مهام جاهزة تنتظر');
+    if (waitBits.length) parts.push(waitBits.join('، و') + '. يلتقطها المنفّذ ' + when('exec') + '.');
     const unplanned = c.commands.filter((i) => !(state.steps[i.number] || []).length && !['in-progress', 'review', 'for-chat'].some((l) => hasLabel(i, l)));
-    if (unplanned.length) parts.push((unplanned.length === 1 ? 'أمرك ' + iso(unplanned[0].number) : unplanned.length + ' أوامر') + ' ينتظر خطة رئيس العمليات ' + nextRun(SCHEDULES.hoo) + '.');
+    if (unplanned.length) parts.push((unplanned.length === 1 ? 'أمرك ' + iso(unplanned[0].number) : unplanned.length + ' أوامر') + ' ينتظر خطة رئيس العمليات ' + when('hoo') + '.');
     if (c.pending) parts.push('ينتظر قرارك ' + c.pending + '.');
     $('story').textContent = parts.join(' ');
 
@@ -765,7 +911,7 @@
     }
     const svgEl = $('map');
     const tall = svgEl.parentElement.clientWidth < 900;
-    const sig = JSON.stringify([tall, c.openCommands, c.ready, c.inProgress, c.merged7, state.pulls.length, flow, Object.keys(state.working).sort(), state.agents.map((a) => a.id + a.stage)]);
+    const sig = JSON.stringify([tall, c.openCommands, c.ready, c.inProgress, c.merged7, state.pulls.length, flow, Object.keys(state.working).sort(), Object.keys(state.stalled).sort(), state.agents.map((a) => a.id + a.stage)]);
     if (sig === state.mapSig) return;
     state.mapSig = sig;
     drawMap(svgEl, tall, c, flow, looseReview);
@@ -963,7 +1109,7 @@
   async function loadChat(id) {
     const thread = $('dr-thread'), status = $('dr-chat-status');
     const issue = state.chats[id];
-    if (!issue) { thread.replaceChildren(el('div', { class: 'empty', text: 'لا محادثة بعد. اكتب أول رسالة.' })); status.textContent = 'يرد ' + nameOf(id) + ' في تشغيل المنفّذ التالي (' + nextRun(SCHEDULES.exec) + ').'; return; }
+    if (!issue) { thread.replaceChildren(el('div', { class: 'empty', text: 'لا محادثة بعد. اكتب أول رسالة.' })); status.textContent = 'يرد ' + nameOf(id) + ' في تشغيل المنفّذ التالي (' + when('exec') + ').'; return; }
     thread.replaceChildren(el('div', { class: 'empty', text: 'يحمّل المحادثة…' }));
     try {
       const comments = await gh(rp() + '/issues/' + issue.number + '/comments?per_page=100');
@@ -974,7 +1120,7 @@
         ...mdToNodes(x.text))));
       thread.scrollTop = thread.scrollHeight;
       const last = msgs[msgs.length - 1];
-      status.textContent = last && last.who === 'me' ? 'ينتظر رد ' + nameOf(id) + '. يرد في تشغيل المنفّذ التالي (' + nextRun(SCHEDULES.exec) + ').' : '';
+      status.textContent = last && last.who === 'me' ? 'ينتظر رد ' + nameOf(id) + '. يرد في تشغيل المنفّذ التالي (' + when('exec') + ').' : '';
     } catch (e) { thread.replaceChildren(el('div', { class: 'notice', text: 'تعذّر تحميل المحادثة: ' + e.message })); }
   }
   async function ensureAgentLabel(id) {
@@ -996,8 +1142,9 @@
         state.chats[id] = await gh(rp() + '/issues', { method: 'POST', body: { title: '💬 محادثة: ' + nameOf(id), body, labels: ['chat', 'agent:' + id] } });
       }
       box.value = '';
-      toast('أُرسلت رسالتك إلى ' + nameOf(id) + '. يرد ' + nextRun(SCHEDULES.exec) + '.');
+      toast('أُرسلت رسالتك إلى ' + nameOf(id) + '. يرد ' + when('exec') + '.');
       await loadChat(id);
+      loadAll();
     } catch (e) { toast('لم تُرسل: ' + e.message); } finally { btn.disabled = false; }
   }
   async function chatToCommand() {
@@ -1069,18 +1216,28 @@
     const box = $('pending');
     if (!total) { box.replaceChildren(el('div', { class: 'empty', text: 'لا شيء ينتظرك الآن.' })); return; }
     const checks = await Promise.all(pulls.map(checksFor));
-    const items = reviews.map((i) => el('div', { class: 'item' },
-      el('div', { class: 'title' }, link(i.html_url, cleanTitle(i.title))),
-      el('div', { class: 'meta' }, el('span', { class: 'tag ok', text: '📦 سُلّم ' + iso(i.number) }), el('span', { text: 'اقرأ «التسليم» وجرّب الناتج' })),
-      el('div', { class: 'actions' },
-        el('button', { class: 'btn go small', onclick: () => closeCommand(i) }, 'تم، أغلق الأمر'),
-        el('button', { class: 'btn small', onclick: () => requestChanges(i.number, 'review') }, 'طلب تعديل'))
-    ));
+    const crLine = (num) => {
+      const cr = openChangeRequest(num); if (!cr) return null;
+      const [cls, line] = sentStatus(cr);
+      return el('div', { class: 'status-line ' + cls }, el('span', { text: '🔁 طلبت تعديلاً ' + ago(cr.ts) + '. ' + line }));
+    };
+    const items = reviews.map((i) => {
+      const cr = openChangeRequest(i.number);
+      return el('div', { class: 'item' },
+        el('div', { class: 'title' }, link(i.html_url, cleanTitle(i.title))),
+        el('div', { class: 'meta' }, el('span', { class: 'tag ' + (cr ? 'wait' : 'ok'), text: (cr ? '🔁 تعديل مطلوب ' : '📦 سُلّم ') + iso(i.number) }), cr ? null : el('span', { text: 'اقرأ «التسليم» وجرّب الناتج' })),
+        crLine(i.number),
+        el('div', { class: 'actions' },
+          el('button', { class: 'btn go small', onclick: () => closeCommand(i) }, 'تم، أغلق الأمر'),
+          el('button', { class: 'btn small', onclick: () => requestChanges(i.number, 'review') }, cr ? 'أضف إلى طلب التعديل' : 'طلب تعديل'))
+      );
+    });
     items.push(...pulls.map((p, k) => {
       const [ct, cc, ok] = checks[k];
       return el('div', { class: 'item' },
         el('div', { class: 'title' }, link(p.html_url, p.title)),
         el('div', { class: 'meta' }, el('span', { class: 'tag', text: 'PR ' + iso(p.number) }), el('span', { class: 'tag ' + cc, text: ct }), el('span', { text: ago(p.created_at) })),
+        crLine(p.number),
         el('div', { class: 'actions' },
           el('button', { class: 'btn go small', disabled: p.draft || !ok ? true : null, onclick: () => approvePR(p) }, 'موافقة ودمج'),
           el('button', { class: 'btn small', onclick: () => requestChanges(p.number, 'PR') }, 'طلب تعديل'))
@@ -1100,10 +1257,12 @@
   // ---------- commands, human tasks ----------
   function commandStatus(i, steps) {
     if (i.state !== 'open') return ['أُغلق', 'ok'];
+    const cr = openChangeRequest(i.number);
+    if (cr) return ['طلبت تعديلاً، لم يُعالج بعد', 'wait'];
     if (hasLabel(i, 'review')) return ['سُلّم، ينتظر مراجعتك', 'ok'];
     if (hasLabel(i, 'for-chat')) return ['في محادثة Claude', 'wait'];
     if (steps.length || hasLabel(i, 'in-progress')) return ['قيد التنفيذ', 'wait'];
-    return ['ينتظر خطة رئيس العمليات (' + nextRun(SCHEDULES.hoo) + ')', ''];
+    return ['ينتظر خطة رئيس العمليات: ' + when('hoo'), ''];
   }
   function renderCommands(list) {
     const box = $('commands');
@@ -1188,7 +1347,7 @@
     const labels = ['command']; if (agent && agentLabels.has('agent:' + agent)) labels.push('agent:' + agent);
     try {
       const issue = await gh(rp() + '/issues', { method: 'POST', body: { title, body, labels } });
-      toast('أُرسل الأمر ' + iso(issue.number) + '. يكتب رئيس العمليات خطته ' + nextRun(SCHEDULES.hoo) + '، أو فوراً إن ضغطت Run now على مهمته.', issue.html_url);
+      toast('أُرسل الأمر ' + iso(issue.number) + '. يكتب رئيس العمليات خطته ' + when('hoo') + '، أو فوراً إن ضغطت Run now على مهمته.', issue.html_url);
       loadAll();
       return true;
     } catch (e) { toast('لم يُرسل الأمر: ' + e.message); return false; }
@@ -1217,8 +1376,11 @@
     const asks = kind === 'PR' || kind === 'review';
     const text = await modal({ title: (kind === 'PR' ? 'طلب تعديل على PR ' : kind === 'review' ? 'طلب تعديل على الأمر ' : 'تعليق على ') + iso(n), input: 'ما الذي تريد تغييره؟', okText: 'إرسال' });
     if (!text) return;
-    try { const c = await gh(rp() + '/issues/' + n + '/comments', { method: 'POST', body: { body: (asks ? '🔁 **طلب تعديل من المؤسس**\n\n' : '') + text + '\n\n' + MARK } }); toast('أُرسل تعليقك على ' + iso(n) + '.', c.html_url); }
-    catch (e) { toast('لم يُرسل: ' + e.message); }
+    try {
+      const c = await gh(rp() + '/issues/' + n + '/comments', { method: 'POST', body: { body: (asks ? '🔁 **طلب تعديل من المؤسس**\n\n' : '') + text + '\n\n' + MARK } });
+      toast((asks ? 'أُرسل طلب التعديل على ' : 'أُرسل تعليقك على ') + iso(n) + '. تتابع حالته تحت «طلباتك» حتى يستلمه وكيل.', c.html_url);
+      await loadAll();
+    } catch (e) { toast('لم يُرسل: ' + e.message); }
   }
   async function closeCommand(i) {
     const ok = await modal({ title: 'قبول التسليم وإغلاق الأمر ' + iso(i.number), body: cleanTitle(i.title) + '\n\nيُغلق الأمر بعد تعليق قبول باسمك. لطلب شيء جديد أرسل أمراً جديداً.', okText: 'أغلق الأمر', okClass: 'go' });
@@ -1254,7 +1416,7 @@
   function tick() {
     const f = (tz) => { try { return new Intl.DateTimeFormat('ar', { timeZone: tz, hour: '2-digit', minute: '2-digit' }).format(new Date()); } catch (e) { return '--:--'; } };
     $('clock-ams').textContent = f('Europe/Amsterdam'); $('clock-dam').textContent = f('Asia/Damascus');
-    $('next-exec').textContent = nextRun(SCHEDULES.exec); $('next-hoo').textContent = nextRun(SCHEDULES.hoo);
+    if (token) chips();
   }
 
   // ---------- setup / session ----------
@@ -1291,7 +1453,7 @@
     });
     $('token-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('connect-btn').click(); });
     $('logout-btn').addEventListener('click', async () => { const ok = await modal({ title: 'خروج', body: 'سيُحذف الرمز من هذا المتصفح، وستحتاج لصقه من جديد.', okText: 'خروج', okClass: 'stop' }); if (ok) { forget(); token = ''; showSetup(''); } });
-    $('refresh-btn').addEventListener('click', loadAll);
+    $('refresh-btn').addEventListener('click', () => loadAll(true));
     $('cmd-send').addEventListener('click', sendCommand);
     $('cmd-text').addEventListener('input', autosize);
     $('cmd-text').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) sendCommand(); });
